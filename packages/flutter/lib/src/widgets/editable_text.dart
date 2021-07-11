@@ -4159,17 +4159,31 @@ class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
   String? uri;
   Uint8List? data;
 
-  bool get hasData => this.data != null && this.data.length > 0;
+  bool get hasData => data != null && data!.isNotEmpty;
 
   CommittedContent({this.mimeType, this.uri, this.data});
 
-  static CommittedContent fromMap(Map<String, dynamic> data) {
-    var content = new CommittedContent();
-    if (data == null) return content;
-
-    if (data.containsKey('mimeType')) content.mimeType = data['mimeType'] as String?;
-    if (data.containsKey('uri')) content.uri = data['uri'] as String?;
-    if (data.containsKey('data')) content.data = data['data'] as Uint8List?;
-    return content;
+  static CommittedContent fromMap(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return CommittedContent();
+    return CommittedContent(
+        mimeType: data['mimeType'] as String?,
+        uri: data['uri'] as String?,
+        data: Uint8List.fromList(List<int>.from(data['data'] as Iterable<dynamic>))
+    );
   }
+
+  @override
+  String toString() => '${objectRuntimeType(this, 'CommittedContent')}($mimeType, $uri, $data)';
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) return false;
+    return other is CommittedContent
+        && other.mimeType == mimeType
+        && other.uri == uri
+        && other.data == data;
+  }
+
+  @override
+  int get hashCode => hashValues(mimeType, uri, data);
 }
