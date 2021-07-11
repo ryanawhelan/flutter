@@ -13,6 +13,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
+import '../../foundation.dart';
 import 'autofill.dart';
 import 'automatic_keep_alive.dart';
 import 'basic.dart';
@@ -2969,17 +2970,31 @@ class CommittedContent {
   String? uri;
   Uint8List? data;
 
-  bool get hasData => this.data != null && this.data.length > 0;
+  bool get hasData => data != null && data.isEmpty;
 
   CommittedContent({this.mimeType, this.uri, this.data});
 
-  static CommittedContent fromMap(Map<String, dynamic> data) {
-    var content = new CommittedContent();
-    if (data == null) return content;
-    
-    if (data.containsKey('mimeType')) content.mimeType = data['mimeType'] as String?;
-    if (data.containsKey('uri')) content.uri = data['uri'] as String?;
-    if (data.containsKey('data')) content.data = data['data'] as Uint8List?;
-    return content;
+  static CommittedContent fromMap(Map<String, dynamic>? data) {
+    if (data == null || data!.isEmpty) return CommittedContent();
+    return CommittedContent(
+        mimeType: data['mimeType'] as String?,
+        uri: data['uri'] as String?,
+        data: data['data'] as Uint8List?
+    );
   }
+
+  @override
+  String toString() => '${objectRuntimeType(this, 'CommittedContent')}($mimeType, $uri, $data)';
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) return false;
+    return other is CommittedContent 
+        && other.mimeType == mimeType
+        && other.uri == uri
+        && other.data == data;
+  }
+
+  @override
+  int get hashCode => hashValues(mimeType, uri, data);
 }
