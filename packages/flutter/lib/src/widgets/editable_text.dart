@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui hide TextStyle;
 
 import 'package:characters/characters.dart' show CharacterRange, StringCharacters;
@@ -4156,7 +4157,7 @@ class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
   class CommittedContent {
   String? mimeType;
   String? uri;
-  UInt8List? data;
+  Uint8List? data;
 
   bool get hasData => this.data != null && this.data.length > 0;
 
