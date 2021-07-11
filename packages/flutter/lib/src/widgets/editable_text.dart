@@ -13,7 +13,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
-import '../../foundation.dart';
 import 'autofill.dart';
 import 'automatic_keep_alive.dart';
 import 'basic.dart';
