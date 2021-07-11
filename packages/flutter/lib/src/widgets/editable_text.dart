@@ -1910,7 +1910,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
 
   @override
   void commitContent(Map<String, dynamic> content) {
-    widget.onContentCommitted!(content);
+    widget.onContentCommitted!(CommittedContent.fromMap(content));
     _finalizeEditing(TextInputAction.none, shouldUnfocus: false);
   }
 
@@ -3133,5 +3133,25 @@ class _Editable extends MultiChildRenderObjectWidget {
       ..promptRectColor = promptRectColor
       ..clipBehavior = clipBehavior
       ..setPromptRectRange(promptRectRange);
+  }
+}
+
+class CommittedContent {
+  String? mimeType;
+  String? uri;
+  UInt8List? data;
+
+  bool get hasData => this.data != null && this.data.length > 0;
+
+  CommittedContent({this.mimeType, this.uri, this.data});
+
+  static CommittedContent fromMap(Map<String, dynamic> data) {
+    var content = new CommittedContent();
+    if (data == null) return content;
+    
+    if (data.containsKey('mimeType')) content.mimeType = data['mimeType'] as String?;
+    if (data.containsKey('uri')) content.uri = data['uri'] as String?;
+    if (data.containsKey('data')) content.data = data['data'] as Uint8List?;
+    return content;
   }
 }
