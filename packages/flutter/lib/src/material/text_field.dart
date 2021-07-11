@@ -671,9 +671,9 @@ class TextField extends StatefulWidget {
   ///         const Text('Here's a text field that supports inserting gif content:'),
   ///         TextField(
   ///           controller: _controller,
-  ///           onContentCommitted: (Map<String, dynamic> data) async {
-  ///             if (data['mimeType'] == "image/gif" && data['data'] != null) {
-  ///               List<int> bytes = (data['data'] as List)?.map((e) => e as int)?.toList();
+  ///           onContentCommitted: (CommittedContent data) async {
+  ///             if (data.mimeType == "image/gif" && data.data != null) {
+  ///               //handle Uint8List (e.g. upload to server, display a MemoryImage, etc)
   ///               ...
   ///             }
   ///           },
@@ -685,7 +685,7 @@ class TextField extends StatefulWidget {
   /// ```
   /// {@end-tool}
   /// {@endtemplate}
-  final ValueChanged<Map<String, dynamic>>? onContentCommitted;
+  final ValueChanged<CommittedContent>? onContentCommitted;
 
   /// {@macro flutter.widgets.editableText.onEditingComplete}
   final VoidCallback? onEditingComplete;
