@@ -1080,7 +1080,7 @@ abstract class TextInputClient {
   /// Requests that this client perform the given action.
   void performAction(TextInputAction action);
 
-  /// Notify client about new content insertion, like gif or PNG...
+  /// Notify client about new content insertion from Android keyboard
   void commitContent(Map<String, dynamic> content);
 
   /// Request from the input method that this client perform the given private
