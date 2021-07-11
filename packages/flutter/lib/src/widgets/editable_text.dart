@@ -1050,9 +1050,9 @@ class EditableText extends StatefulWidget {
   ///         const Text('Here's a text field that supports inserting gif content:'),
   ///         TextField(
   ///           controller: _controller,
-  ///           onContentCommitted: (Map<String, dynamic> data) async {
-  ///             if (data['mimeType'] == "image/gif" && data['data'] != null) {
-  ///               List<int> bytes = (data['data'] as List)?.map((e) => e as int)?.toList();
+  ///           onContentCommitted: (CommittedContent data) async {
+  ///             if (data.mimeType == "image/gif" && data.data != null) {
+  ///               //handle Uint8List (e.g. upload to server, display a MemoryImage, etc)
   ///               ...
   ///             }
   ///           },
@@ -1064,7 +1064,7 @@ class EditableText extends StatefulWidget {
   /// ```
   /// {@end-tool}
   /// {@endtemplate}
-  final ValueChanged<Map<String, dynamic>>? onContentCommitted;
+  final ValueChanged<CommittedContent>? onContentCommitted;
 
   /// {@template flutter.widgets.editableText.onEditingComplete}
   /// Called when the user submits editable content (e.g., user presses the "done"
