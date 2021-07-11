@@ -462,7 +462,7 @@ class EditableText extends StatefulWidget {
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
     this.onChanged,
-    this.onContentCommited,
+    this.onContentCommitted,
     this.onEditingComplete,
     this.onSubmitted,
     this.onAppPrivateCommand,
@@ -1013,7 +1013,7 @@ class EditableText extends StatefulWidget {
   final ValueChanged<String>? onChanged;
 
   /// Once new content such as GIF is commited...
-  final ValueChanged<Map<String, dynamic>>? onContentCommited;
+  final ValueChanged<Map<String, dynamic>>? onContentCommitted;
 
   /// {@template flutter.widgets.editableText.onEditingComplete}
   /// Called when the user submits editable content (e.g., user presses the "done"
@@ -1804,7 +1804,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
 
   @override
   void commitContent(Map<String, dynamic> content) {
-    widget.onContentCommited!(content);
+    widget.onContentCommitted!(content);
     _finalizeEditing(TextInputAction.none, shouldUnfocus: false);
   }
 
