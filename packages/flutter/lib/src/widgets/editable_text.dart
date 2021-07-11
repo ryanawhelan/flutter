@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui hide TextStyle;
 
 import 'package:flutter/foundation.dart';
@@ -3185,7 +3186,7 @@ class _Editable extends MultiChildRenderObjectWidget {
 class CommittedContent {
   String? mimeType;
   String? uri;
-  UInt8List? data;
+  Uint8List? data;
 
   bool get hasData => this.data != null && this.data.length > 0;
 
