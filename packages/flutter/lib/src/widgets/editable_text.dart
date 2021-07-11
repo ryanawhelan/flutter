@@ -2970,7 +2970,7 @@ class CommittedContent {
   String? uri;
   Uint8List? data;
 
-  bool get hasData => data != null && data.isEmpty;
+  bool get hasData => data != null && data!.isNotEmpty;
 
   CommittedContent({this.mimeType, this.uri, this.data});
 
