@@ -949,7 +949,53 @@ class EditableText extends StatefulWidget {
   ///    which are more specialized input change notifications.
   final ValueChanged<String>? onChanged;
 
-  /// Once new content such as GIF is commited...
+  /// Called when a user inserts image-based content through the device keyboard
+  /// on Android only.
+  ///
+  /// The map will contain the following data:
+  ///  - MIME Type (supporting png, bmp, jpg, tiff, gif, jpeg, and webp)
+  ///  - Bytes
+  ///  - URI
+  ///
+  /// You will want to use the bytes to display the image.
+  ///
+  /// {@tool dartpad --template=stateful_widget_material}
+  ///
+  /// This example shows how to access the data for committed content in your
+  /// `TextField`.
+  ///
+  /// ```dart
+  /// final TextEditingController _controller = TextEditingController();
+  ///
+  /// @override
+  /// void dispose() {
+  ///   _controller.dispose();
+  ///   super.dispose();
+  /// }
+  ///
+  /// @override
+  /// Widget build(BuildContext context) {
+  ///   return Scaffold(
+  ///     body: Column(
+  ///       mainAxisAlignment: MainAxisAlignment.center,
+  ///       children: <Widget>[
+  ///         const Text('Here's a text field that supports inserting gif content:'),
+  ///         TextField(
+  ///           controller: _controller,
+  ///           onContentCommitted: (Map<String, dynamic> data) async {
+  ///             if (data['mimeType'] == "image/gif" && data['data'] != null) {
+  ///               List<int> bytes = (data['data'] as List)?.map((e) => e as int)?.toList();
+  ///               ...
+  ///             }
+  ///           },
+  ///         ),
+  ///       ],
+  ///     ),
+  ///   );
+  /// }
+  /// ```
+  /// {@end-tool}
+  /// {@endtemplate}
   final ValueChanged<Map<String, dynamic>>? onContentCommitted;
 
   /// {@template flutter.widgets.editableText.onEditingComplete}
@@ -1910,7 +1956,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
 
   @override
   void commitContent(Map<String, dynamic> content) {
-    widget.onContentCommitted!(CommittedContent.fromMap(content));
+    widget.onContentCommitted?.call(CommittedContent.fromMap(content));
     _finalizeEditing(TextInputAction.none, shouldUnfocus: false);
   }
 
@@ -3148,7 +3194,7 @@ class CommittedContent {
   static CommittedContent fromMap(Map<String, dynamic> data) {
     var content = new CommittedContent();
     if (data == null) return content;
-    
+
     if (data.containsKey('mimeType')) content.mimeType = data['mimeType'] as String?;
     if (data.containsKey('uri')) content.uri = data['uri'] as String?;
     if (data.containsKey('data')) content.data = data['data'] as Uint8List?;
