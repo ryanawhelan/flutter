@@ -274,6 +274,7 @@ class CupertinoTextField extends StatefulWidget {
     this.maxLengthEnforced = true,
     this.maxLengthEnforcement,
     this.onChanged,
+    this.onContentCommited,
     this.onEditingComplete,
     this.onSubmitted,
     this.inputFormatters,
@@ -704,6 +705,9 @@ class CupertinoTextField extends StatefulWidget {
 
   /// {@macro flutter.widgets.editableText.onChanged}
   final ValueChanged<String>? onChanged;
+
+  /// Once new content is commited...
+  final ValueChanged<Map<String, dynamic>>? onContentCommited;
 
   /// {@macro flutter.widgets.editableText.onEditingComplete}
   final VoidCallback? onEditingComplete;
@@ -1250,6 +1254,7 @@ class _CupertinoTextFieldState extends State<CupertinoTextField> with Restoratio
             selectionControls: widget.selectionEnabled
               ? textSelectionControls : null,
             onChanged: widget.onChanged,
+            onContentCommited: widget.onContentCommited,
             onSelectionChanged: _handleSelectionChanged,
             onEditingComplete: widget.onEditingComplete,
             onSubmitted: widget.onSubmitted,

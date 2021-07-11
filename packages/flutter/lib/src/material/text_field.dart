@@ -324,6 +324,7 @@ class TextField extends StatefulWidget {
     this.maxLengthEnforced = true,
     this.maxLengthEnforcement,
     this.onChanged,
+    this.onContentCommited,
     this.onEditingComplete,
     this.onSubmitted,
     this.onAppPrivateCommand,
@@ -601,6 +602,9 @@ class TextField extends StatefulWidget {
   ///  * [onEditingComplete], [onSubmitted]:
   ///    which are more specialized input change notifications.
   final ValueChanged<String>? onChanged;
+
+  /// Once new content is commited...
+  final ValueChanged<Map<String, dynamic>>? onContentCommited;
 
   /// {@macro flutter.widgets.editableText.onEditingComplete}
   final VoidCallback? onEditingComplete;
@@ -1247,6 +1251,7 @@ class _TextFieldState extends State<TextField> with RestorationMixin implements 
           selectionColor: focusNode.hasFocus ? selectionColor : null,
           selectionControls: widget.selectionEnabled ? textSelectionControls : null,
           onChanged: widget.onChanged,
+          onContentCommited: widget.onContentCommited,
           onSelectionChanged: _handleSelectionChanged,
           onEditingComplete: widget.onEditingComplete,
           onSubmitted: widget.onSubmitted,
