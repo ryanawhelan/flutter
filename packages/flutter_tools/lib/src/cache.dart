@@ -475,7 +475,7 @@ class Cache {
     _maybeWarnAboutStorageOverride(overrideUrl);
     return overrideUrl;
   }
-  
+
   /// The base for URLs that store Flutter engine artifacts in CIPD.
   ///
   /// For some platforms, such as Web and Fuchsia, CIPD artifacts are fetched
