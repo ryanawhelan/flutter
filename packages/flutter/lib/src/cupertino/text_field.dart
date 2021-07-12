@@ -273,7 +273,7 @@ class CupertinoTextField extends StatefulWidget {
     this.maxLengthEnforced = true,
     this.maxLengthEnforcement,
     this.onChanged,
-    this.onContentCommited,
+    this.onContentCommitted,
     this.onEditingComplete,
     this.onSubmitted,
     this.inputFormatters,
@@ -427,6 +427,7 @@ class CupertinoTextField extends StatefulWidget {
     this.maxLengthEnforced = true,
     this.maxLengthEnforcement,
     this.onChanged,
+    this.onContentCommitted,
     this.onEditingComplete,
     this.onSubmitted,
     this.inputFormatters,
@@ -690,8 +691,54 @@ class CupertinoTextField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.onChanged}
   final ValueChanged<String>? onChanged;
 
-  /// Once new content is commited...
-  final ValueChanged<Map<String, dynamic>>? onContentCommited;
+  /// Called when a user inserts image-based content through the device keyboard
+  /// on Android only.
+  ///
+  /// The map will contain the following data:
+  ///  - MIME Type (supporting png, bmp, jpg, tiff, gif, jpeg, and webp)
+  ///  - Bytes
+  ///  - URI
+  ///
+  /// You will want to use the bytes to display the image.
+  ///
+  /// {@tool dartpad --template=stateful_widget_material}
+  ///
+  /// This example shows how to access the data for committed content in your
+  /// `TextField`.
+  ///
+  /// ```dart
+  /// final TextEditingController _controller = TextEditingController();
+  ///
+  /// @override
+  /// void dispose() {
+  ///   _controller.dispose();
+  ///   super.dispose();
+  /// }
+  ///
+  /// @override
+  /// Widget build(BuildContext context) {
+  ///   return Scaffold(
+  ///     body: Column(
+  ///       mainAxisAlignment: MainAxisAlignment.center,
+  ///       children: <Widget>[
+  ///         const Text('Here's a text field that supports inserting gif content:'),
+  ///         TextField(
+  ///           controller: _controller,
+  ///           onContentCommitted: (CommittedContent data) async {
+  ///             if (data.mimeType == "image/gif" && data.data != null) {
+  ///               //handle Uint8List (e.g. upload to server, display a MemoryImage, etc)
+  ///               ...
+  ///             }
+  ///           },
+  ///         ),
+  ///       ],
+  ///     ),
+  ///   );
+  /// }
+  /// ```
+  /// {@end-tool}
+  /// {@endtemplate}
+  final ValueChanged<CommittedContent>? onContentCommitted;
 
   /// {@macro flutter.widgets.editableText.onEditingComplete}
   final VoidCallback? onEditingComplete;
@@ -1190,7 +1237,7 @@ class _CupertinoTextFieldState extends State<CupertinoTextField> with Restoratio
             selectionControls: widget.selectionEnabled
               ? textSelectionControls : null,
             onChanged: widget.onChanged,
-            onContentCommited: widget.onContentCommited,
+            onContentCommitted: widget.onContentCommitted,
             onSelectionChanged: _handleSelectionChanged,
             onEditingComplete: widget.onEditingComplete,
             onSubmitted: widget.onSubmitted,
