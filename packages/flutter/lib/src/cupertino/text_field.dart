@@ -432,6 +432,7 @@ class CupertinoTextField extends StatefulWidget {
     this.maxLengthEnforced = true,
     this.maxLengthEnforcement,
     this.onChanged,
+    this.onContentCommitted,
     this.onEditingComplete,
     this.onSubmitted,
     this.inputFormatters,
