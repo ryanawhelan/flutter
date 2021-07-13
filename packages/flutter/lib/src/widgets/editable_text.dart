@@ -2974,7 +2974,7 @@ class CommittedContent {
   CommittedContent({this.mimeType, this.uri, this.data});
 
   static CommittedContent fromMap(Map<String, dynamic>? data) {
-    if (data == null || data!.isEmpty) return CommittedContent();
+    if (data == null || data.isEmpty) return CommittedContent();
     return CommittedContent(
         mimeType: data['mimeType'] as String?,
         uri: data['uri'] as String?,
