@@ -2978,7 +2978,7 @@ class CommittedContent {
     return CommittedContent(
         mimeType: data['mimeType'] as String?,
         uri: data['uri'] as String?,
-        data: Uint8List.fromList(List<int>.from(data['data']))
+        data: Uint8List.fromList(List<int>.from(data['data'] as Iterable<dynamic>))
     );
   }
 
