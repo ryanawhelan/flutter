@@ -207,7 +207,7 @@ void main() {
             (ByteData? _) {},
       );
 
-      expect(client.latestMethodCall, 'performAction');
+      expect(client.latestMethodCall, 'commitContent');
     });
 
     test('TextInputClient performPrivateCommand method is called', () async {
@@ -416,6 +416,11 @@ class FakeTextInputClient implements TextInputClient {
   @override
   void performAction(TextInputAction action) {
     latestMethodCall = 'performAction';
+  }
+
+  @override
+  void commitContent(Map<String, dynamic> content) {
+    latestMethodCall = 'commitContent';
   }
 
   @override
