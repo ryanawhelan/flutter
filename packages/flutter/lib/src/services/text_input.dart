@@ -466,6 +466,7 @@ class TextInputConfiguration {
     this.keyboardAppearance = Brightness.light,
     this.textCapitalization = TextCapitalization.none,
     this.autofillConfiguration,
+    this.contentCommitEnabled = false,
   }) : assert(inputType != null),
        assert(obscureText != null),
        smartDashesType = smartDashesType ?? (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
@@ -474,7 +475,8 @@ class TextInputConfiguration {
        assert(enableSuggestions != null),
        assert(keyboardAppearance != null),
        assert(inputAction != null),
-       assert(textCapitalization != null);
+       assert(textCapitalization != null),
+       assert(contentCommitEnabled != null);
 
   /// The type of information for which to optimize the text input control.
   final TextInputType inputType;
@@ -590,6 +592,10 @@ class TextInputConfiguration {
   /// Defaults to [Brightness.light].
   final Brightness keyboardAppearance;
 
+  /// Whether the user has specified an [onContentCommitted] function in their
+  /// text input widget or not.
+  final bool contentCommitEnabled;
+
   /// Returns a representation of this object as a JSON object.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -605,6 +611,7 @@ class TextInputConfiguration {
       'textCapitalization': textCapitalization.toString(),
       'keyboardAppearance': keyboardAppearance.toString(),
       if (autofillConfiguration != null) 'autofill': autofillConfiguration!.toJson(),
+      'contentCommitEnabled': contentCommitEnabled,
     };
   }
 }

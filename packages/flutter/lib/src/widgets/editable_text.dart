@@ -2664,6 +2664,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
         autofillHints: widget.autofillHints?.toList(growable: false) ?? <String>[],
         currentEditingValue: currentTextEditingValue,
       ),
+      contentCommitEnabled: widget.onContentCommitted != null,
     );
   }
 
