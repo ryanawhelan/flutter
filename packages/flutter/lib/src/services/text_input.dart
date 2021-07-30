@@ -466,7 +466,7 @@ class TextInputConfiguration {
     this.keyboardAppearance = Brightness.light,
     this.textCapitalization = TextCapitalization.none,
     this.autofillConfiguration,
-    this.contentCommitEnabled = false,
+    this.contentCommitMimeTypes = const <String>[],
   }) : assert(inputType != null),
        assert(obscureText != null),
        smartDashesType = smartDashesType ?? (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
@@ -476,7 +476,7 @@ class TextInputConfiguration {
        assert(keyboardAppearance != null),
        assert(inputAction != null),
        assert(textCapitalization != null),
-       assert(contentCommitEnabled != null);
+       assert(contentCommitMimeTypes != null);
 
   /// The type of information for which to optimize the text input control.
   final TextInputType inputType;
@@ -594,7 +594,7 @@ class TextInputConfiguration {
 
   /// Whether the user has specified an [onContentCommitted] function in their
   /// text input widget or not.
-  final bool contentCommitEnabled;
+  final List<String> contentCommitMimeTypes;
 
   /// Returns a representation of this object as a JSON object.
   Map<String, dynamic> toJson() {
@@ -611,7 +611,7 @@ class TextInputConfiguration {
       'textCapitalization': textCapitalization.toString(),
       'keyboardAppearance': keyboardAppearance.toString(),
       if (autofillConfiguration != null) 'autofill': autofillConfiguration!.toJson(),
-      'contentCommitEnabled': contentCommitEnabled,
+      'contentCommitMimeTypes': contentCommitMimeTypes,
     };
   }
 }
