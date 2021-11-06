@@ -488,5 +488,10 @@ class FakeTextInputClient implements TextInputClient {
     latestMethodCall = 'showAutocorrectionPromptRect';
   }
 
+  @override
+  void commitContent(Map<String, dynamic> content) {
+    latestMethodCall = 'commitContent';
+  }
+
   TextInputConfiguration get configuration => const TextInputConfiguration();
 }
