@@ -2006,7 +2006,6 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
   @override
   void commitContent(Map<String, dynamic> content) {
     widget.onContentCommitted?.call(CommittedContent.fromMap(content));
-    _finalizeEditing(TextInputAction.none, shouldUnfocus: false);
   }
 
   // The original position of the caret on FloatingCursorDragState.start.
