@@ -281,3 +281,4 @@ PreRunValidator get preRunValidator => context.get<PreRunValidator>() ?? const N
 
 // TODO(fujino): Migrate to 'main' https://github.com/flutter/flutter/issues/95041
 const String kDefaultFrameworkChannel = 'master';
+
