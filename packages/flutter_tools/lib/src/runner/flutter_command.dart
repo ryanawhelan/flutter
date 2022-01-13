@@ -1158,7 +1158,7 @@ abstract class FlutterCommand extends Command<void> {
         }
         FlutterCommandResult commandResult = FlutterCommandResult.fail();
         try {
-          commandResult = await verifyThenRunCommand(commandPath);
+          commandResult = await verifyThenRunCommand(commandPath!);
         } finally {
           final DateTime endTime = globals.systemClock.now();
           globals.printTrace(userMessages.flutterElapsedTime(name, getElapsedAsMilliseconds(endTime.difference(startTime))));

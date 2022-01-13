@@ -4151,9 +4151,11 @@ class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
   }
 
   @override
-  bool get isActionEnabled => state._value.selection.isValid && !state._value.selection.isCollapsed;
+  bool get isActionEnabled =>
+      state._value.selection.isValid && !state._value.selection.isCollapsed;
+}
 
-  class CommittedContent {
+class CommittedContent {
   String? mimeType;
   String? uri;
   Uint8List? data;

@@ -94,7 +94,7 @@ class ScreenshotCommand extends FlutterCommand {
   @override
   Future<FlutterCommandResult> verifyThenRunCommand(String? commandPath) async {
     await _validateOptions(stringArg(_kType), stringArg(_kObservatoryUrl));
-    return super.verifyThenRunCommand(commandPath);
+    return super.verifyThenRunCommand(commandPath!);
   }
 
   @override

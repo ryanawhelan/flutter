@@ -40,7 +40,7 @@ class LogsCommand extends FlutterCommand {
     if (device == null) {
       throwToolExit(null);
     }
-    return super.verifyThenRunCommand(commandPath);
+    return super.verifyThenRunCommand(commandPath!);
   }
 
   @override

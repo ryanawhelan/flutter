@@ -740,6 +740,11 @@ class FakeTextInputClient implements TextInputClient {
     latestMethodCall = 'showToolbar';
   }
 
+  @override
+  void commitContent(Map<String, dynamic> content) {
+    latestMethodCall = 'commitContent';
+  }
+
   TextInputConfiguration get configuration => const TextInputConfiguration();
 
   @override
