@@ -1025,6 +1025,9 @@ abstract class TextInputClient {
   /// Requests that this client perform the given action.
   void performAction(TextInputAction action);
 
+  /// Notify client about new content insertion from Android keyboard
+  void commitContent(Map<String, dynamic> content);
+
   /// Request from the input method that this client perform the given private
   /// command.
   ///
@@ -1557,7 +1560,11 @@ class TextInput {
         (_currentConnection!._client as DeltaTextInputClient).updateEditingValueWithDeltas(deltas);
         break;
       case 'TextInputClient.performAction':
-        _currentConnection!._client.performAction(_toTextInputAction(args[1] as String));
+        if (args[1] as String == 'TextInputAction.commitContent') {
+          _currentConnection!._client.commitContent(args[2] as Map<String, dynamic>);
+        } else {
+          _currentConnection!._client.performAction(_toTextInputAction(args[1] as String));
+        }
         break;
       case 'TextInputClient.performPrivateCommand':
         final Map<String, dynamic> firstArg = args[1] as Map<String, dynamic>;
