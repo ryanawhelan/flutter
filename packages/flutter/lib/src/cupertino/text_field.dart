@@ -294,6 +294,7 @@ class CupertinoTextField extends StatefulWidget {
     this.scrollController,
     this.scrollPhysics,
     this.autofillHints = const <String>[],
+    this.contentCommitMimeTypes = const <String>[],
     this.clipBehavior = Clip.hardEdge,
     this.restorationId,
     this.enableIMEPersonalizedLearning = true,
@@ -339,6 +340,7 @@ class CupertinoTextField extends StatefulWidget {
          'Use keyboardType TextInputType.multiline when using TextInputAction.newline on a multiline TextField.',
        ),
        assert(enableIMEPersonalizedLearning != null),
+       assert(contentCommitMimeTypes != null),
        keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
        toolbarOptions = toolbarOptions ?? (obscureText ?
          const ToolbarOptions(
@@ -455,6 +457,7 @@ class CupertinoTextField extends StatefulWidget {
     this.clipBehavior = Clip.hardEdge,
     this.restorationId,
     this.enableIMEPersonalizedLearning = true,
+    this.contentCommitMimeTypes = const <String> [],
   }) : assert(textAlign != null),
        assert(readOnly != null),
        assert(autofocus != null),
@@ -498,6 +501,7 @@ class CupertinoTextField extends StatefulWidget {
        ),
        assert(clipBehavior != null),
        assert(enableIMEPersonalizedLearning != null),
+       assert(contentCommitMimeTypes!= null),
        keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
        toolbarOptions = toolbarOptions ?? (obscureText ?
          const ToolbarOptions(
@@ -850,6 +854,47 @@ class CupertinoTextField extends StatefulWidget {
   /// {@macro flutter.services.TextInputConfiguration.enableIMEPersonalizedLearning}
   final bool enableIMEPersonalizedLearning;
 
+  /// Used when a user inserts image-based content through the device keyboard
+  /// on Android only.
+  ///
+  /// The passed list of strings will determine which MIME types are allowed to
+  /// be inserted via the device keyboard
+  ///
+  /// This example shows how to limit your keyboard commits to specific file types
+  /// `TextField`.
+  ///
+  /// ```dart
+  /// final TextEditingController _controller = TextEditingController();
+  ///
+  /// @override
+  /// void dispose() {
+  ///   _controller.dispose();
+  ///   super.dispose();
+  /// }
+  ///
+  /// @override
+  /// Widget build(BuildContext context) {
+  ///   return Scaffold(
+  ///     body: Column(
+  ///       mainAxisAlignment: MainAxisAlignment.center,
+  ///       children: <Widget>[
+  ///         const Text('Here's a text field that supports inserting gif content:'),
+  ///         TextField(
+  ///           controller: _controller,
+  ///           contentCommitMimeTypes: ['image/gif', 'image/png'],
+  ///           onContentCommitted: (CommittedContent data) async {
+  ///             ...
+  ///           },
+  ///         ),
+  ///       ],
+  ///     ),
+  ///   );
+  /// }
+  /// ```
+  /// {@end-tool}
+  /// {@endtemplate}
+  final List<String> contentCommitMimeTypes;
+
   @override
   State<CupertinoTextField> createState() => _CupertinoTextFieldState();
 
@@ -893,6 +938,7 @@ class CupertinoTextField extends StatefulWidget {
     properties.add(EnumProperty<TextDirection>('textDirection', textDirection, defaultValue: null));
     properties.add(DiagnosticsProperty<Clip>('clipBehavior', clipBehavior, defaultValue: Clip.hardEdge));
     properties.add(DiagnosticsProperty<bool>('enableIMEPersonalizedLearning', enableIMEPersonalizedLearning, defaultValue: true));
+    properties.add(DiagnosticsProperty<List<String>>('contentCommitMimeTypes', contentCommitMimeTypes, defaultValue: null));
   }
 }
 

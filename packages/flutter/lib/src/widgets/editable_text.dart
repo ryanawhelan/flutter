@@ -460,6 +460,7 @@ class EditableText extends StatefulWidget {
     ),
     this.autofillHints = const <String>[],
     this.autofillClient,
+    this.contentCommitMimeTypes = const <String>[],
     this.clipBehavior = Clip.hardEdge,
     this.restorationId,
     this.scrollBehavior,
@@ -503,6 +504,7 @@ class EditableText extends StatefulWidget {
        assert(toolbarOptions != null),
        assert(clipBehavior != null),
        assert(enableIMEPersonalizedLearning != null),
+       assert(contentCommitMimeTypes != null),
        _strutStyle = strutStyle,
        keyboardType = keyboardType ?? _inferKeyboardType(autofillHints: autofillHints, maxLines: maxLines),
        inputFormatters = maxLines == 1
@@ -1285,6 +1287,47 @@ class EditableText extends StatefulWidget {
   /// [AutofillClient]. This property may override [autofillHints].
   final AutofillClient? autofillClient;
 
+  /// Used when a user inserts image-based content through the device keyboard
+  /// on Android only.
+  ///
+  /// The passed list of strings will determine which MIME types are allowed to
+  /// be inserted via the device keyboard
+  ///
+  /// This example shows how to limit your keyboard commits to specific file types
+  /// `TextField`.
+  ///
+  /// ```dart
+  /// final TextEditingController _controller = TextEditingController();
+  ///
+  /// @override
+  /// void dispose() {
+  ///   _controller.dispose();
+  ///   super.dispose();
+  /// }
+  ///
+  /// @override
+  /// Widget build(BuildContext context) {
+  ///   return Scaffold(
+  ///     body: Column(
+  ///       mainAxisAlignment: MainAxisAlignment.center,
+  ///       children: <Widget>[
+  ///         const Text('Here's a text field that supports inserting gif content:'),
+  ///         TextField(
+  ///           controller: _controller,
+  ///           contentCommitMimeTypes: ['image/gif', 'image/png'],
+  ///           onContentCommitted: (CommittedContent data) async {
+  ///             ...
+  ///           },
+  ///         ),
+  ///       ],
+  ///     ),
+  ///   );
+  /// }
+  /// ```
+  /// {@end-tool}
+  /// {@endtemplate}
+  final List<String> contentCommitMimeTypes;
+
   /// {@macro flutter.material.Material.clipBehavior}
   ///
   /// Defaults to [Clip.hardEdge].
@@ -1500,6 +1543,7 @@ class EditableText extends StatefulWidget {
     properties.add(DiagnosticsProperty<Iterable<String>>('autofillHints', autofillHints, defaultValue: null));
     properties.add(DiagnosticsProperty<TextHeightBehavior>('textHeightBehavior', textHeightBehavior, defaultValue: null));
     properties.add(DiagnosticsProperty<bool>('enableIMEPersonalizedLearning', enableIMEPersonalizedLearning, defaultValue: true));
+    properties.add(DiagnosticsProperty<List<String>>('contentCommitMimeTypes', contentCommitMimeTypes, defaultValue: null));
   }
 }
 
@@ -2840,6 +2884,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
       keyboardAppearance: widget.keyboardAppearance,
       autofillConfiguration: autofillConfiguration,
       enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
+      contentCommitMimeTypes: widget.contentCommitMimeTypes
     );
   }
 
