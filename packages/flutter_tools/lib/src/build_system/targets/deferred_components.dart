@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// @dart = 2.8
+
 import 'package:meta/meta.dart';
 
 import '../../android/deferred_components_gen_snapshot_validator.dart';
@@ -17,8 +19,8 @@ import 'android.dart';
 class DeferredComponentsGenSnapshotValidatorTarget extends Target {
   /// Create an [AndroidAotDeferredComponentsBundle] implementation for a given [targetPlatform] and [buildMode].
   DeferredComponentsGenSnapshotValidatorTarget({
-    required this.deferredComponentsDependencies,
-    required this.nonDeferredComponentsDependencies,
+    @required this.deferredComponentsDependencies,
+    @required this.nonDeferredComponentsDependencies,
     this.title,
     this.exitOnFail = true,
   });
@@ -29,7 +31,7 @@ class DeferredComponentsGenSnapshotValidatorTarget extends Target {
 
   /// The title of the [DeferredComponentsGenSnapshotValidator] that is
   /// displayed to the developer when logging results.
-  final String? title;
+  final String title;
 
   /// Whether to exit the tool if a recommended change is found by the
   /// [DeferredComponentsGenSnapshotValidator].
@@ -70,7 +72,7 @@ class DeferredComponentsGenSnapshotValidatorTarget extends Target {
   }
 
   @visibleForTesting
-  DeferredComponentsGenSnapshotValidator? validator;
+  DeferredComponentsGenSnapshotValidator validator;
 
   @override
   Future<void> build(Environment environment) async {
@@ -90,18 +92,18 @@ class DeferredComponentsGenSnapshotValidatorTarget extends Target {
         abis: _abis
     );
 
-    validator!
+    validator
       ..checkAppAndroidManifestComponentLoadingUnitMapping(
-          FlutterProject.current().manifest.deferredComponents ?? <DeferredComponent>[],
+          FlutterProject.current().manifest.deferredComponents,
           generatedLoadingUnits,
       )
       ..checkAgainstLoadingUnitsCache(generatedLoadingUnits)
       ..writeLoadingUnitsCache(generatedLoadingUnits);
 
-    validator!.handleResults();
+    validator.handleResults();
 
     depfileService.writeToFile(
-      Depfile(validator!.inputs, validator!.outputs),
+      Depfile(validator.inputs, validator.outputs),
       environment.buildDir.childFile('flutter_$name.d'),
     );
   }

@@ -2869,7 +2869,6 @@ class _Location {
     required this.file,
     required this.line,
     required this.column,
-    // ignore: unused_element
     this.name,
   });
 
@@ -2917,9 +2916,9 @@ bool _isDebugCreator(DiagnosticsNode node) => node is DiagnosticsDebugCreator;
 /// in [WidgetsBinding.initInstances].
 ///
 /// This is meant to be called only in debug mode. In other modes, it yields an empty list.
-Iterable<DiagnosticsNode> debugTransformDebugCreator(Iterable<DiagnosticsNode> properties) {
+Iterable<DiagnosticsNode> debugTransformDebugCreator(Iterable<DiagnosticsNode> properties) sync* {
   if (!kDebugMode) {
-    return <DiagnosticsNode>[];
+    return;
   }
   final List<DiagnosticsNode> pending = <DiagnosticsNode>[];
   ErrorSummary? errorSummary;
@@ -2930,22 +2929,20 @@ Iterable<DiagnosticsNode> debugTransformDebugCreator(Iterable<DiagnosticsNode> p
     }
   }
   bool foundStackTrace = false;
-  final List<DiagnosticsNode> result = <DiagnosticsNode>[];
   for (final DiagnosticsNode node in properties) {
     if (!foundStackTrace && node is DiagnosticsStackTrace)
       foundStackTrace = true;
     if (_isDebugCreator(node)) {
-      result.addAll(_parseDiagnosticsNode(node, errorSummary));
+      yield* _parseDiagnosticsNode(node, errorSummary);
     } else {
       if (foundStackTrace) {
         pending.add(node);
       } else {
-        result.add(node);
+        yield node;
       }
     }
   }
-  result.addAll(pending);
-  return result;
+  yield* pending;
 }
 
 /// Transform the input [DiagnosticsNode].
@@ -2954,24 +2951,23 @@ Iterable<DiagnosticsNode> debugTransformDebugCreator(Iterable<DiagnosticsNode> p
 Iterable<DiagnosticsNode> _parseDiagnosticsNode(
   DiagnosticsNode node,
   ErrorSummary? errorSummary,
-) {
+) sync* {
   assert(_isDebugCreator(node));
   try {
     final DebugCreator debugCreator = node.value! as DebugCreator;
     final Element element = debugCreator.element;
-    return _describeRelevantUserCode(element, errorSummary);
+    yield* _describeRelevantUserCode(element, errorSummary);
   } catch (error, stack) {
     scheduleMicrotask(() {
       FlutterError.reportError(FlutterErrorDetails(
         exception: error,
         stack: stack,
         library: 'widget inspector',
-        informationCollector: () => <DiagnosticsNode>[
-          DiagnosticsNode.message('This exception was caught while trying to describe the user-relevant code of another error.'),
-        ],
+        informationCollector: () sync* {
+          yield DiagnosticsNode.message('This exception was caught while trying to describe the user-relevant code of another error.');
+        }
       ));
     });
-    return <DiagnosticsNode>[];
   }
 }
 

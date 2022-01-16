@@ -15,12 +15,11 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import io.flutter.FlutterInjector
 import io.flutter.embedding.android.FlutterFragment
-import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.embedding.engine.dart.DartExecutor
 
 class MainActivity : FragmentActivity() {
-    private val numberOfFlutters = 20
+    private val numberOfFlutters = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,10 +40,8 @@ class MainActivity : FragmentActivity() {
             DartExecutor.DartEntrypoint(
                 FlutterInjector.instance().flutterLoader().findAppBundlePath(), "main"
             )
-        val engines = generateSequence(0)  { it + 1 }
-            .take(numberOfFlutters)
-            .map { app.engines.createAndRunEngine(this, dartEntrypoint) }
-            .toList()
+        val topEngine = app.engines.createAndRunEngine(this, dartEntrypoint)
+        val bottomEngine = app.engines.createAndRunEngine(this, dartEntrypoint)
         for (i in 0 until numberOfFlutters) {
             val flutterContainer = FrameLayout(this)
             root.addView(flutterContainer)
@@ -54,7 +51,7 @@ class MainActivity : FragmentActivity() {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 1.0f
             )
-            val engine = engines[i]
+            val engine = if (i == 0) topEngine else bottomEngine
             FlutterEngineCache.getInstance().put(i.toString(), engine)
             val flutterFragment =
                 FlutterFragment.withCachedEngine(i.toString()).build<FlutterFragment>()

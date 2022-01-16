@@ -300,7 +300,7 @@ class NavigationDestination extends StatelessWidget {
         return Stack(
           alignment: Alignment.center,
           children: <Widget>[
-            NavigationIndicator(
+            _NavigationIndicator(
               animation: animation,
               color: navigationBarTheme.indicatorColor,
             ),
@@ -507,24 +507,20 @@ class _NavigationDestinationInfo extends InheritedWidget {
   }
 }
 
-/// Selection Indicator for the Material 3 [NavigationBar] and [NavigationRail]
-/// components.
+/// Selection Indicator for the Material 3 Navigation Bar component.
 ///
 /// When [animation] is 0, the indicator is not present. As [animation] grows
 /// from 0 to 1, the indicator scales in on the x axis.
 ///
-/// Used in a [Stack] widget behind the icons in the Material 3 Navigation Bar
+/// Useful in a [Stack] widget behind the icons in the Material 3 Navigation Bar
 /// to illuminate the selected destination.
-class NavigationIndicator extends StatelessWidget {
+class _NavigationIndicator extends StatelessWidget {
   /// Builds an indicator, usually used in a stack behind the icon of a
   /// navigation bar destination.
-  const NavigationIndicator({
+  const _NavigationIndicator({
     Key? key,
     required this.animation,
     this.color,
-    this.width = 64,
-    this.height = 32,
-    this.borderRadius = const BorderRadius.all(Radius.circular(16)),
   }) : super(key: key);
 
   /// Determines the scale of the indicator.
@@ -537,21 +533,6 @@ class NavigationIndicator extends StatelessWidget {
   ///
   /// If null, defaults to [ColorScheme.secondary].
   final Color? color;
-
-  /// The width of the container that holds in the indicator.
-  ///
-  /// Defaults to `64`.
-  final double width;
-
-  /// The height of the container that holds in the indicator.
-  ///
-  /// Defaults to `32`.
-  final double height;
-
-  /// The radius of the container that holds in the indicator.
-  ///
-  /// Defaults to `BorderRadius.circular(16)`.
-  final BorderRadius borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -592,10 +573,10 @@ class NavigationIndicator extends StatelessWidget {
               return FadeTransition(
                 opacity: fadeAnimation,
                 child: Container(
-                  width: width,
-                  height: height,
+                  width: 64.0,
+                  height: 32.0,
                   decoration: BoxDecoration(
-                    borderRadius: borderRadius,
+                    borderRadius: const BorderRadius.all(Radius.circular(16.0)),
                     color: color ?? colorScheme.secondary.withOpacity(.24),
                   ),
                 ),
@@ -898,9 +879,17 @@ class _ClampTextScaleFactor extends StatelessWidget {
   /// surrounding [child].
   const _ClampTextScaleFactor({
     Key? key,
+    this.lowerLimit = 0,
     this.upperLimit = double.infinity,
     required this.child,
   }) : super(key: key);
+
+  /// The minimum amount that the text scale factor should be for the [child]
+  /// widget.
+  ///
+  /// If this is `.5`, the textScaleFactor for child widgets will never be
+  /// smaller than `.5`.
+  final double lowerLimit;
 
   /// The maximum amount that the text scale factor should be for the [child]
   /// widget.
@@ -918,7 +907,7 @@ class _ClampTextScaleFactor extends StatelessWidget {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
         textScaleFactor: MediaQuery.of(context).textScaleFactor.clamp(
-          0.0,
+          lowerLimit,
           upperLimit,
         ),
       ),

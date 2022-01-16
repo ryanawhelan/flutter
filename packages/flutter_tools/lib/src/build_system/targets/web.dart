@@ -2,9 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// @dart = 2.8
+
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
+import 'package:meta/meta.dart';
 import 'package:package_config/package_config.dart';
 
 import '../../artifacts.dart';
@@ -15,11 +18,10 @@ import '../../cache.dart';
 import '../../convert.dart';
 import '../../dart/language_version.dart';
 import '../../dart/package_map.dart';
-import '../../globals.dart' as globals;
+import '../../globals_null_migrated.dart' as globals;
 import '../../project.dart';
 import '../build_system.dart';
 import '../depfile.dart';
-import '../exceptions.dart';
 import 'assets.dart';
 import 'localizations.dart';
 
@@ -62,7 +64,7 @@ const String kOfflineFirst = 'offline-first';
 const String kNoneWorker = 'none';
 
 /// Convert a [value] into a [ServiceWorkerStrategy].
-ServiceWorkerStrategy _serviceWorkerStrategyFromString(String? value) {
+ServiceWorkerStrategy _serviceWorkerStrategyFromString(String value) {
   switch (value) {
     case kNoneWorker:
       return ServiceWorkerStrategy.none;
@@ -95,7 +97,7 @@ class WebEntrypointTarget extends Target {
 
   @override
   Future<void> build(Environment environment) async {
-    final String? targetFile = environment.defines[kTargetFile];
+    final String targetFile = environment.defines[kTargetFile];
     final bool hasPlugins = environment.defines[kHasWebPlugins] == 'true';
     final Uri importUri = environment.fileSystem.file(targetFile).absolute.uri;
     // TODO(zanderso): support configuration of this file.
@@ -108,7 +110,7 @@ class WebEntrypointTarget extends Target {
     final LanguageVersion languageVersion = determineLanguageVersion(
       environment.fileSystem.file(targetFile),
       packageConfig[flutterProject.manifest.appName],
-      Cache.flutterRoot!,
+      Cache.flutterRoot,
     );
 
     // Use the PackageConfig to find the correct package-scheme import path
@@ -209,21 +211,16 @@ class Dart2JSTarget extends Target {
 
   @override
   Future<void> build(Environment environment) async {
-    final String? buildModeEnvironment = environment.defines[kBuildMode];
-    if (buildModeEnvironment == null) {
-      throw MissingDefineException(kBuildMode, name);
-    }
-    final BuildMode buildMode = getBuildModeForName(buildModeEnvironment);
+    final BuildMode buildMode = getBuildModeForName(environment.defines[kBuildMode]);
     final bool sourceMapsEnabled = environment.defines[kSourceMapsEnabled] == 'true';
     final bool nativeNullAssertions = environment.defines[kNativeNullAssertions] == 'true';
-    final Artifacts artifacts = globals.artifacts!;
-    final String librariesSpec = (artifacts.getHostArtifact(HostArtifact.flutterWebSdk) as Directory).childFile('libraries.json').path;
+    final String librariesSpec = (globals.artifacts.getHostArtifact(HostArtifact.flutterWebSdk) as Directory).childFile('libraries.json').path;
     final List<String> sharedCommandOptions = <String>[
-      artifacts.getHostArtifact(HostArtifact.engineDartBinary).path,
+      globals.artifacts.getHostArtifact(HostArtifact.engineDartBinary).path,
       '--disable-dart-dev',
-      artifacts.getHostArtifact(HostArtifact.dart2jsSnapshot).path,
+      globals.artifacts.getHostArtifact(HostArtifact.dart2jsSnapshot).path,
       '--libraries-spec=$librariesSpec',
-      ...decodeCommaSeparated(environment.defines, kExtraFrontEndOptions),
+      ...?decodeCommaSeparated(environment.defines, kExtraFrontEndOptions),
       if (nativeNullAssertions)
         '--native-null-assertions',
       if (buildMode == BuildMode.profile)
@@ -250,7 +247,7 @@ class Dart2JSTarget extends Target {
       throw Exception(_collectOutput(kernelResult));
     }
 
-    final String? dart2jsOptimization = environment.defines[kDart2jsOptimization];
+    final String dart2jsOptimization = environment.defines[kDart2jsOptimization];
     final File outputJSFile = environment.buildDir.childFile('main.dart.js');
     final bool csp = environment.defines[kCspMode] == 'true';
 
@@ -269,7 +266,7 @@ class Dart2JSTarget extends Target {
     final File dart2jsDeps = environment.buildDir
       .childFile('app.dill.deps');
     if (!dart2jsDeps.existsSync()) {
-      globals.printWarning('Warning: dart2js did not produced expected deps list at '
+      globals.printError('Warning: dart2js did not produced expected deps list at '
         '${dart2jsDeps.path}');
       return;
     }
@@ -387,11 +384,12 @@ class WebReleaseBundle extends Target {
             "navigator.serviceWorker.register('flutter_service_worker.js')",
             "navigator.serviceWorker.register('flutter_service_worker.js?v=$randomHash')",
           );
-        final String? baseHref = environment.defines[kBaseHref];
-        if (resultString.contains(kBaseHrefPlaceholder) && baseHref == null) {
+        if (resultString.contains(kBaseHrefPlaceholder) &&
+            environment.defines[kBaseHref] == null) {
           resultString = resultString.replaceAll(kBaseHrefPlaceholder, '/');
-        } else if (resultString.contains(kBaseHrefPlaceholder) && baseHref != null) {
-          resultString = resultString.replaceAll(kBaseHrefPlaceholder, baseHref);
+        } else if (resultString.contains(kBaseHrefPlaceholder) &&
+            environment.defines[kBaseHref] != null) {
+          resultString = resultString.replaceAll(kBaseHrefPlaceholder, environment.defines[kBaseHref]);
         }
         outputFile.writeAsStringSync(resultString);
         continue;
@@ -412,10 +410,9 @@ class WebReleaseBundle extends Target {
 /// These assets can be cached forever and are only invalidated when the
 /// Flutter SDK is upgraded to a new version.
 class WebBuiltInAssets extends Target {
-  const WebBuiltInAssets(this.fileSystem, this.cache);
+  const WebBuiltInAssets(this.fileSystem);
 
   final FileSystem fileSystem;
-  final Cache cache;
 
   @override
   String get name => 'web_static_assets';
@@ -434,15 +431,7 @@ class WebBuiltInAssets extends Target {
 
   @override
   Future<void> build(Environment environment) async {
-    // TODO(yjbanov): https://github.com/flutter/flutter/issues/52588
-    //
-    // Update this when we start building CanvasKit from sources. In the
-    // meantime, get the Web SDK directory from cache rather than through
-    // Artifacts. The latter is sensitive to `--local-engine`, which changes
-    // the directory to point to ENGINE/src/out. However, CanvasKit is not yet
-    // built as part of the engine, but fetched from CIPD, and so it won't be
-    // found in ENGINE/src/out.
-    final Directory flutterWebSdk = cache.getWebSdkDirectory();
+    final Directory flutterWebSdk = globals.artifacts.getHostArtifact(HostArtifact.flutterWebSdk) as Directory;
     final Directory canvasKitDirectory = flutterWebSdk.childDirectory('canvaskit');
     for (final File file in canvasKitDirectory.listSync(recursive: true).whereType<File>()) {
       final String relativePath = fileSystem.path.relative(file.path, from: canvasKitDirectory.path);
@@ -454,10 +443,9 @@ class WebBuiltInAssets extends Target {
 
 /// Generate a service worker for a web target.
 class WebServiceWorker extends Target {
-  const WebServiceWorker(this.fileSystem, this.cache);
+  const WebServiceWorker(this.fileSystem);
 
   final FileSystem fileSystem;
-  final Cache cache;
 
   @override
   String get name => 'web_service_worker';
@@ -466,7 +454,7 @@ class WebServiceWorker extends Target {
   List<Target> get dependencies => <Target>[
     const Dart2JSTarget(),
     const WebReleaseBundle(),
-    WebBuiltInAssets(fileSystem, cache),
+    WebBuiltInAssets(fileSystem),
   ];
 
   @override
@@ -551,7 +539,7 @@ class WebServiceWorker extends Target {
 String generateServiceWorker(
   Map<String, String> resources,
   List<String> coreBundle, {
-  required ServiceWorkerStrategy serviceWorkerStrategy,
+  @required ServiceWorkerStrategy serviceWorkerStrategy,
 }) {
   if (serviceWorkerStrategy == ServiceWorkerStrategy.none) {
     return '';

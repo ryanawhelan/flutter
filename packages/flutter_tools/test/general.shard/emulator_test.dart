@@ -97,6 +97,7 @@ void main() {
             stdout: 'existing-avd-1',
           ),
         ]),
+        androidSdk: null,
         androidWorkflow: AndroidWorkflow(
           androidSdk: sdk,
           featureFlags: TestFeatureFlags(),

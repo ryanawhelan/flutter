@@ -46,6 +46,12 @@ Future<void> main(List<String> args) async {
   )).trim();
 
   <Command<void>>[
+    RollDevCommand(
+      checkouts: checkouts,
+      fileSystem: fileSystem,
+      platform: platform,
+      stdio: stdio,
+    ),
     CodesignCommand(
       checkouts: checkouts,
       flutterRoot: _localFlutterRoot,

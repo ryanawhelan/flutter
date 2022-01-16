@@ -2,10 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// @dart = 2.8
+
 import '../base/common.dart';
 import '../base/file_system.dart';
 import '../base/logger.dart';
-import '../globals.dart' as globals;
+import '../globals_null_migrated.dart' as globals;
 import '../localizations/gen_l10n.dart';
 import '../localizations/gen_l10n_types.dart';
 import '../localizations/localizations_utils.dart';
@@ -19,8 +21,8 @@ import '../runner/flutter_command.dart';
 /// [internationalization user guide](flutter.dev/go/i18n-user-guide).
 class GenerateLocalizationsCommand extends FlutterCommand {
   GenerateLocalizationsCommand({
-    required FileSystem fileSystem,
-    required Logger logger,
+    FileSystem fileSystem,
+    Logger logger,
   }) :
     _fileSystem = fileSystem,
     _logger = logger {
@@ -106,6 +108,7 @@ class GenerateLocalizationsCommand extends FlutterCommand {
     );
     argParser.addFlag(
       'use-deferred-loading',
+      defaultsTo: false,
       help: 'Whether to generate the Dart localization file with locales imported '
             'as deferred, allowing for lazy loading of each locale in Flutter web.\n'
             '\n'
@@ -211,24 +214,25 @@ class GenerateLocalizationsCommand extends FlutterCommand {
         logger: _logger,
         options: options,
         projectDir: _fileSystem.currentDirectory,
+        dependenciesDir: null,
         fileSystem: _fileSystem,
       );
       return FlutterCommandResult.success();
     }
 
-    final String inputPathString = stringArg('arb-dir')!; // Has default value, cannot be null.
-    final String? outputPathString = stringArg('output-dir');
-    final String outputFileString = stringArg('output-localization-file')!; // Has default value, cannot be null.
-    final String templateArbFileName = stringArg('template-arb-file')!; // Has default value, cannot be null.
-    final String? untranslatedMessagesFile = stringArg('untranslated-messages-file');
-    final String classNameString = stringArg('output-class')!; // Has default value, cannot be null.
+    final String inputPathString = stringArg('arb-dir');
+    final String outputPathString = stringArg('output-dir');
+    final String outputFileString = stringArg('output-localization-file');
+    final String templateArbFileName = stringArg('template-arb-file');
+    final String untranslatedMessagesFile = stringArg('untranslated-messages-file');
+    final String classNameString = stringArg('output-class');
     final List<String> preferredSupportedLocales = stringsArg('preferred-supported-locales');
-    final String? headerString = stringArg('header');
-    final String? headerFile = stringArg('header-file');
+    final String headerString = stringArg('header');
+    final String headerFile = stringArg('header-file');
     final bool useDeferredLoading = boolArg('use-deferred-loading');
-    final String? inputsAndOutputsListPath = stringArg('gen-inputs-and-outputs-list');
+    final String inputsAndOutputsListPath = stringArg('gen-inputs-and-outputs-list');
     final bool useSyntheticPackage = boolArg('synthetic-package');
-    final String? projectPathString = stringArg('project-dir');
+    final String projectPathString = stringArg('project-dir');
     final bool areResourceAttributesRequired = boolArg('required-resource-attributes');
     final bool usesNullableGetter = boolArg('nullable-getter');
 

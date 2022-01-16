@@ -72,8 +72,7 @@ void main() {
   testUsingContext('DebugUniversalFramework creates simulator binary', () async {
     environment.defines[kIosArchs] = 'x86_64';
     environment.defines[kSdkRoot] = 'path/to/iPhoneSimulator.sdk';
-    final String appFrameworkPath = environment.buildDir.childDirectory('App.framework').childFile('App').path;
-    processManager.addCommands(<FakeCommand>[
+    processManager.addCommand(
       FakeCommand(command: <String>[
         'xcrun',
         'clang',
@@ -99,17 +98,12 @@ void main() {
         '-isysroot',
         'path/to/iPhoneSimulator.sdk',
         '-o',
-        appFrameworkPath,
+        environment.buildDir
+            .childDirectory('App.framework')
+            .childFile('App')
+            .path,
       ]),
-      FakeCommand(command: <String>[
-        'codesign',
-        '--force',
-        '--sign',
-        '-',
-        '--timestamp=none',
-        appFrameworkPath,
-      ]),
-    ]);
+    );
 
     await const DebugUniversalFramework().build(environment);
     expect(processManager.hasRemainingExpectations, isFalse);
@@ -122,8 +116,7 @@ void main() {
   testUsingContext('DebugUniversalFramework creates expected binary with arm64 only arch', () async {
     environment.defines[kIosArchs] = 'arm64';
     environment.defines[kSdkRoot] = 'path/to/iPhoneOS.sdk';
-    final String appFrameworkPath = environment.buildDir.childDirectory('App.framework').childFile('App').path;
-    processManager.addCommands(<FakeCommand>[
+    processManager.addCommand(
       FakeCommand(command: <String>[
         'xcrun',
         'clang',
@@ -136,17 +129,12 @@ void main() {
             '.tmp_rand0', 'flutter_tools_stub_source.rand0', 'debug_app.cc')),
         ..._kSharedConfig,
         '-o',
-        appFrameworkPath,
+        environment.buildDir
+            .childDirectory('App.framework')
+            .childFile('App')
+            .path,
       ]),
-      FakeCommand(command: <String>[
-        'codesign',
-        '--force',
-        '--sign',
-        '-',
-        '--timestamp=none',
-        appFrameworkPath,
-      ]),
-    ]);
+    );
 
     await const DebugUniversalFramework().build(environment);
     expect(processManager.hasRemainingExpectations, isFalse);
@@ -329,7 +317,6 @@ void main() {
     FakeCommand lipoCommandNonFatResult;
     FakeCommand lipoVerifyArm64Command;
     FakeCommand bitcodeStripCommand;
-    FakeCommand adHocCodesignCommand;
 
     setUp(() {
       final FileSystem fileSystem = MemoryFileSystem.test();
@@ -364,15 +351,6 @@ void main() {
         binary.path,
         '-m',
         '-o',
-        binary.path,
-      ]);
-
-      adHocCodesignCommand = FakeCommand(command: <String>[
-        'codesign',
-        '--force',
-        '--sign',
-        '-',
-        '--timestamp=none',
         binary.path,
       ]);
     });
@@ -411,7 +389,6 @@ void main() {
           '-verify_arch',
           'x86_64',
         ]),
-        adHocCodesignCommand,
       ]);
       await const DebugUnpackIOS().build(environment);
 
@@ -561,7 +538,6 @@ void main() {
         copyPhysicalFrameworkCommand,
         lipoCommandNonFatResult,
         lipoVerifyArm64Command,
-        adHocCodesignCommand,
       ]);
       await const DebugUnpackIOS().build(environment);
 
@@ -611,7 +587,6 @@ void main() {
           'armv7',
           binary.path,
         ]),
-        adHocCodesignCommand,
       ]);
 
       await const DebugUnpackIOS().build(environment);
@@ -683,7 +658,6 @@ void main() {
         lipoCommandNonFatResult,
         lipoVerifyArm64Command,
         bitcodeStripCommand,
-        adHocCodesignCommand,
       ]);
       await const DebugUnpackIOS().build(environment);
 

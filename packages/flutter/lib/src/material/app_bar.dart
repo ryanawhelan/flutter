@@ -1047,7 +1047,7 @@ class _AppBarState extends State<AppBar> {
       ? _systemOverlayStyleForBrightness(
           widget.brightness
           ?? appBarTheme.brightness
-          ?? ThemeData.estimateBrightnessForColor(backgroundColor),
+          ?? theme.primaryColorBrightness,
         )
       : widget.systemOverlayStyle
         ?? appBarTheme.systemOverlayStyle

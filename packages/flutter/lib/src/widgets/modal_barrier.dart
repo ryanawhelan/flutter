@@ -34,7 +34,6 @@ class ModalBarrier extends StatelessWidget {
     Key? key,
     this.color,
     this.dismissible = true,
-    this.onDismiss,
     this.semanticsLabel,
     this.barrierSemanticsDismissible = true,
   }) : super(key: key);
@@ -47,28 +46,13 @@ class ModalBarrier extends StatelessWidget {
   ///    [ModalBarrier] built by [ModalRoute] pages.
   final Color? color;
 
-  /// Specifies if the barrier will be dismissed when the user taps on it.
-  ///
-  /// If true, and [onDismiss] is non-null, [onDismiss] will be called,
-  /// otherwise the current route will be popped from the ambient [Navigator].
-  ///
-  /// If false, tapping on the barrier will do nothing.
+  /// Whether touching the barrier will pop the current route off the [Navigator].
   ///
   /// See also:
   ///
   ///  * [ModalRoute.barrierDismissible], which controls this property for the
   ///    [ModalBarrier] built by [ModalRoute] pages.
   final bool dismissible;
-
-  /// Called when the barrier is being dismissed.
-  ///
-  /// If non-null [onDismiss] will be called in place of popping the current
-  /// route. It is up to the callback to handle dismissing the barrier.
-  ///
-  /// If null, the ambient [Navigator]'s current route will be popped.
-  ///
-  /// This field is ignored if [dismissible] is false.
-  final VoidCallback? onDismiss;
 
   /// Whether the modal barrier semantics are included in the semantics tree.
   ///
@@ -110,15 +94,7 @@ class ModalBarrier extends StatelessWidget {
     final bool modalBarrierSemanticsDismissible = barrierSemanticsDismissible ?? semanticsDismissible;
 
     void handleDismiss() {
-      if (dismissible) {
-        if (onDismiss != null) {
-          onDismiss!();
-        } else {
-          Navigator.maybePop(context);
-        }
-      } else {
-        SystemSound.play(SystemSoundType.alert);
-      }
+      Navigator.maybePop(context);
     }
 
     return BlockSemantics(
@@ -127,7 +103,12 @@ class ModalBarrier extends StatelessWidget {
         // modal barriers are not dismissible in accessibility mode.
         excluding: !semanticsDismissible || !modalBarrierSemanticsDismissible,
         child: _ModalBarrierGestureDetector(
-          onDismiss: handleDismiss,
+          onDismiss: () {
+            if (dismissible)
+              handleDismiss();
+            else
+              SystemSound.play(SystemSoundType.alert);
+          },
           child: Semantics(
             label: semanticsDismissible ? semanticsLabel : null,
             onDismiss: semanticsDismissible ? handleDismiss : null,

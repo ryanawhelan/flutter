@@ -6,22 +6,19 @@ package com.yourcompany.platforminteraction;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import io.flutter.embedding.android.FlutterActivity;
-import io.flutter.embedding.engine.FlutterEngine;
-import io.flutter.plugin.common.BasicMessageChannel;
-import io.flutter.plugin.common.StringCodec;
+import io.flutter.app.FlutterActivity;
+import io.flutter.plugin.common.*;
+import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity {
-  BasicMessageChannel channel;
-
   @Override
-  public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
-    channel =
-        new BasicMessageChannel<>(flutterEngine.getDartExecutor().getBinaryMessenger(), "navigation-test", StringCodec.INSTANCE);
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    GeneratedPluginRegistrant.registerWith(this);
   }
-
   public void finish() {
+    BasicMessageChannel channel =
+        new BasicMessageChannel<>(getFlutterView(), "navigation-test", StringCodec.INSTANCE);
     channel.send("ping");
   }
 }

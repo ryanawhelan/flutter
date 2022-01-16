@@ -66,7 +66,6 @@ void main() {
       final List<MethodCall> callsToEngine = <MethodCall>[];
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.restoration, (MethodCall call) async {
         callsToEngine.add(call);
-        return null;
       });
       final RestorationManager manager = RestorationManager();
 

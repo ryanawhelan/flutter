@@ -152,7 +152,7 @@ class Slider extends StatefulWidget {
   /// Material design's
   /// [Cross-platform guidelines](https://material.io/design/platform-guidance/cross-platform-adaptation.html).
   ///
-  /// Creates a [CupertinoSlider] if the target platform is iOS or macOS, creates a
+  /// Creates a [CupertinoSlider] if the target platform is iOS, creates a
   /// Material Design slider otherwise.
   ///
   /// If a [CupertinoSlider] is created, the following parameters are
@@ -373,26 +373,17 @@ class Slider extends StatefulWidget {
   /// (like the native default iOS slider).
   final Color? thumbColor;
 
-  /// {@template flutter.material.slider.mouseCursor}
   /// The cursor for a mouse pointer when it enters or is hovering over the
   /// widget.
   ///
   /// If [mouseCursor] is a [MaterialStateProperty<MouseCursor>],
   /// [MaterialStateProperty.resolve] is used for the following [MaterialState]s:
   ///
-  ///  * [MaterialState.dragged].
   ///  * [MaterialState.hovered].
   ///  * [MaterialState.focused].
   ///  * [MaterialState.disabled].
-  /// {@endtemplate}
   ///
-  /// If null, then the value of [SliderThemeData.mouseCursor] is used. If that
-  /// is also null, then [MaterialStateMouseCursor.clickable] is used.
-  ///
-  /// See also:
-  ///
-  ///  * [MaterialStateMouseCursor], which can be used to create a [MouseCursor]
-  ///    that is also a [MaterialStateProperty<MouseCursor>].
+  /// If this property is null, [MaterialStateMouseCursor.clickable] will be used.
   final MouseCursor? mouseCursor;
 
   /// The callback used to create a semantic value from a slider value.
@@ -490,11 +481,6 @@ class _SliderState extends State<Slider> with TickerProviderStateMixin {
   // Value Indicator Animation that appears on the Overlay.
   PaintValueIndicator? paintValueIndicator;
 
-  bool _dragging = false;
-
-  FocusNode? _focusNode;
-  FocusNode get focusNode => widget.focusNode ?? _focusNode!;
-
   @override
   void initState() {
     super.initState();
@@ -521,10 +507,6 @@ class _SliderState extends State<Slider> with TickerProviderStateMixin {
         onInvoke: _actionHandler,
       ),
     };
-    if (widget.focusNode == null) {
-      // Only create a new node if the widget doesn't have one.
-      _focusNode ??= FocusNode();
-    }
   }
 
   @override
@@ -538,7 +520,6 @@ class _SliderState extends State<Slider> with TickerProviderStateMixin {
       overlayEntry!.remove();
       overlayEntry = null;
     }
-    _focusNode?.dispose();
     super.dispose();
   }
 
@@ -551,13 +532,13 @@ class _SliderState extends State<Slider> with TickerProviderStateMixin {
   }
 
   void _handleDragStart(double value) {
-    _dragging = true;
-    widget.onChangeStart?.call(_lerp(value));
+    assert(widget.onChangeStart != null);
+    widget.onChangeStart!(_lerp(value));
   }
 
   void _handleDragEnd(double value) {
-    _dragging = false;
-    widget.onChangeEnd?.call(_lerp(value));
+    assert(widget.onChangeEnd != null);
+    widget.onChangeEnd!(_lerp(value));
   }
 
   void _actionHandler(_AdjustSliderIntent intent) {
@@ -703,47 +684,27 @@ class _SliderState extends State<Slider> with TickerProviderStateMixin {
         color: theme.colorScheme.onPrimary,
       ),
     );
-    final Set<MaterialState> states = <MaterialState>{
-      if (!_enabled) MaterialState.disabled,
-      if (_hovering) MaterialState.hovered,
-      if (_focused) MaterialState.focused,
-      if (_dragging) MaterialState.dragged,
-    };
-    final MouseCursor effectiveMouseCursor = MaterialStateProperty.resolveAs<MouseCursor?>(widget.mouseCursor, states)
-      ?? sliderTheme.mouseCursor?.resolve(states)
-      ?? MaterialStateMouseCursor.clickable.resolve(states);
+    final MouseCursor effectiveMouseCursor = MaterialStateProperty.resolveAs<MouseCursor>(
+      widget.mouseCursor ?? MaterialStateMouseCursor.clickable,
+      <MaterialState>{
+        if (!_enabled) MaterialState.disabled,
+        if (_hovering) MaterialState.hovered,
+        if (_focused) MaterialState.focused,
+      },
+    );
 
     // This size is used as the max bounds for the painting of the value
     // indicators It must be kept in sync with the function with the same name
     // in range_slider.dart.
     Size _screenSize() => MediaQuery.of(context).size;
 
-    VoidCallback? handleDidGainAccessibilityFocus;
-    switch (theme.platform) {
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.iOS:
-      case TargetPlatform.linux:
-      case TargetPlatform.macOS:
-        break;
-      case TargetPlatform.windows:
-        handleDidGainAccessibilityFocus = () {
-          // Automatically activate the slider when it receives a11y focus.
-          if (!focusNode.hasFocus && focusNode.canRequestFocus) {
-            focusNode.requestFocus();
-          }
-        };
-        break;
-    }
-
     return Semantics(
       container: true,
       slider: true,
-      onDidGainAccessibilityFocus: handleDidGainAccessibilityFocus,
       child: FocusableActionDetector(
         actions: _actionMap,
         shortcuts: _shortcutMap,
-        focusNode: focusNode,
+        focusNode: widget.focusNode,
         autofocus: widget.autofocus,
         enabled: _enabled,
         onShowFocusHighlight: _handleFocusHighlightChanged,
@@ -760,8 +721,8 @@ class _SliderState extends State<Slider> with TickerProviderStateMixin {
             textScaleFactor: MediaQuery.of(context).textScaleFactor,
             screenSize: _screenSize(),
             onChanged: (widget.onChanged != null) && (widget.max > widget.min) ? _handleChanged : null,
-            onChangeStart: _handleDragStart,
-            onChangeEnd: _handleDragEnd,
+            onChangeStart: widget.onChangeStart != null ? _handleDragStart : null,
+            onChangeEnd: widget.onChangeEnd != null ? _handleDragEnd : null,
             state: this,
             semanticFormatterCallback: widget.semanticFormatterCallback,
             hasFocus: _focused,

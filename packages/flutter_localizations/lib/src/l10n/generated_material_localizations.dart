@@ -14348,7 +14348,7 @@ class MaterialLocalizationKk extends GlobalMaterialLocalizations {
   String get firstPageTooltip => 'Бірінші бет';
 
   @override
-  String get hideAccountsLabel => 'Аккаунттарды жасыру';
+  String get hideAccountsLabel => 'Есептік жазбаларды жасыру';
 
   @override
   String get inputDateModeButtonLabel => 'Мәтін енгізуге ауысу';
@@ -14504,13 +14504,13 @@ class MaterialLocalizationKk extends GlobalMaterialLocalizations {
   String? get selectedRowCountTitleZero => 'Тармақ таңдалмаған';
 
   @override
-  String get showAccountsLabel => 'Аккаунттарды көрсету';
+  String get showAccountsLabel => 'Есептік жазбаларды көрсету';
 
   @override
   String get showMenuTooltip => 'Мәзірді көрсету';
 
   @override
-  String get signedInLabel => 'Аккаунтқа кірген';
+  String get signedInLabel => 'Есептік жазбаға кірген';
 
   @override
   String get tabLabelRaw => r'$tabCount/$tabIndex қойынды';
@@ -19496,10 +19496,10 @@ class MaterialLocalizationNl extends GlobalMaterialLocalizations {
   String? get selectedRowCountTitleZero => null;
 
   @override
-  String get showAccountsLabel => 'Accounts tonen';
+  String get showAccountsLabel => 'Accounts weergeven';
 
   @override
-  String get showMenuTooltip => 'Menu tonen';
+  String get showMenuTooltip => 'Menu weergeven';
 
   @override
   String get signedInLabel => 'Ingelogd';
@@ -21152,7 +21152,7 @@ class MaterialLocalizationPt extends GlobalMaterialLocalizations {
   String get closeButtonTooltip => 'Fechar';
 
   @override
-  String get collapsedIconTapHint => 'Abrir';
+  String get collapsedIconTapHint => 'Expandir';
 
   @override
   String get continueButtonLabel => 'CONTINUAR';
@@ -21528,9 +21528,6 @@ class MaterialLocalizationPtPt extends MaterialLocalizationPt {
 
   @override
   String get expandedIconTapHint => 'Reduzir';
-
-  @override
-  String get collapsedIconTapHint => 'Expandir';
 
   @override
   String? get remainingTextFieldCharacterCountOne => 'Resta 1 caráter';
