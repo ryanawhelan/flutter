@@ -468,7 +468,6 @@ class TextInputConfiguration {
     this.textCapitalization = TextCapitalization.none,
     this.autofillConfiguration = AutofillConfiguration.disabled,
     this.enableIMEPersonalizedLearning = true,
-    this.contentCommitMimeTypes = const <String>[],
     this.enableDeltaModel = false,
   }) : assert(inputType != null),
        assert(obscureText != null),
@@ -480,7 +479,6 @@ class TextInputConfiguration {
        assert(inputAction != null),
        assert(textCapitalization != null),
        assert(enableIMEPersonalizedLearning != null),
-       assert(contentCommitMimeTypes != null),
        assert(enableDeltaModel != null);
 
   /// The type of information for which to optimize the text input control.
@@ -611,47 +609,6 @@ class TextInputConfiguration {
   /// {@endtemplate}
   final bool enableIMEPersonalizedLearning;
 
-  /// Used when a user inserts image-based content through the device keyboard
-  /// on Android only.
-  ///
-  /// The passed list of strings will determine which MIME types are allowed to
-  /// be inserted via the device keyboard
-  ///
-  /// This example shows how to limit your keyboard commits to specific file types
-  /// `TextField`.
-  ///
-  /// ```dart
-  /// final TextEditingController _controller = TextEditingController();
-  ///
-  /// @override
-  /// void dispose() {
-  ///   _controller.dispose();
-  ///   super.dispose();
-  /// }
-  ///
-  /// @override
-  /// Widget build(BuildContext context) {
-  ///   return Scaffold(
-  ///     body: Column(
-  ///       mainAxisAlignment: MainAxisAlignment.center,
-  ///       children: <Widget>[
-  ///         const Text('Here's a text field that supports inserting gif content:'),
-  ///         TextField(
-  ///           controller: _controller,
-  ///           contentCommitMimeTypes: ['image/gif', 'image/png'],
-  ///           onContentCommitted: (CommittedContent data) async {
-  ///             ...
-  ///           },
-  ///         ),
-  ///       ],
-  ///     ),
-  ///   );
-  /// }
-  /// ```
-  /// {@end-tool}
-  /// {@endtemplate}
-  final List<String> contentCommitMimeTypes;
-
   /// Creates a copy of this [TextInputConfiguration] with the given fields
   /// replaced with new values.
   TextInputConfiguration copyWith({
@@ -668,7 +625,6 @@ class TextInputConfiguration {
     TextCapitalization? textCapitalization,
     bool? enableIMEPersonalizedLearning,
     AutofillConfiguration? autofillConfiguration,
-    List<String>? contentCommitMimeTypes,
     bool? enableDeltaModel,
   }) {
     return TextInputConfiguration(
@@ -685,7 +641,6 @@ class TextInputConfiguration {
       enableIMEPersonalizedLearning: enableIMEPersonalizedLearning?? this.enableIMEPersonalizedLearning,
       autofillConfiguration: autofillConfiguration ?? this.autofillConfiguration,
       enableDeltaModel: enableDeltaModel ?? this.enableDeltaModel,
-      contentCommitMimeTypes: contentCommitMimeTypes ?? this.contentCommitMimeTypes
     );
   }
 
@@ -732,7 +687,6 @@ class TextInputConfiguration {
       'enableIMEPersonalizedLearning': enableIMEPersonalizedLearning,
       if (autofill != null) 'autofill': autofill,
       'enableDeltaModel' : enableDeltaModel,
-      'contentCommitMimeTypes': contentCommitMimeTypes
     };
   }
 }
