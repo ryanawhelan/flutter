@@ -255,8 +255,7 @@ def flutter_install_plugin_pods(application_path = nil, relative_symlink_dir, pl
   plugin_pods.each do |plugin_hash|
     plugin_name = plugin_hash['name']
     plugin_path = plugin_hash['path']
-    has_native_build = plugin_hash.fetch('native_build', true)
-    if (plugin_name && plugin_path && has_native_build)
+    if (plugin_name && plugin_path)
       symlink = File.join(symlink_plugins_dir, plugin_name)
       File.symlink(plugin_path, symlink)
 

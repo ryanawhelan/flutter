@@ -49,11 +49,12 @@ class CleanCommand extends Command<void> {
       'This will abort a work in progress release.';
 
   @override
-  Future<void> run() {
+  void run() {
     final ArgResults argumentResults = argResults!;
     final File stateFile = checkouts.fileSystem.file(argumentResults[kStateOption]);
     if (!stateFile.existsSync()) {
-      throw ConductorException('No persistent state file found at ${stateFile.path}!');
+      throw ConductorException(
+          'No persistent state file found at ${stateFile.path}!');
     }
 
     if (!(argumentResults[kYesFlag] as bool)) {
@@ -66,28 +67,10 @@ class CleanCommand extends Command<void> {
       // Only proceed if the first character of stdin is 'y' or 'Y'
       if (response.isEmpty || response[0].toLowerCase() != 'y') {
         stdio.printStatus('Aborting clean operation.');
+        return;
       }
     }
     stdio.printStatus('Deleting persistent state file ${stateFile.path}...');
-
-    final CleanContext cleanContext = CleanContext(
-      stateFile: stateFile,
-    );
-    return cleanContext.run();
-  }
-}
-
-/// Context for cleaning up persistent state file.
-///
-/// This is a frontend-agnostic implementation.
-class CleanContext {
-  CleanContext({
-    required this.stateFile,
-  });
-
-  final File stateFile;
-
-  Future<void> run() {
-    return stateFile.delete();
+    stateFile.deleteSync();
   }
 }

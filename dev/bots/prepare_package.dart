@@ -24,8 +24,6 @@ const String gsBase = 'gs://flutter_infra_release';
 const String gsReleaseFolder = '$gsBase$releaseFolder';
 const String baseUrl = 'https://storage.googleapis.com/flutter_infra_release';
 const int shortCacheSeconds = 60;
-const String frameworkVersionTag = 'frameworkVersionFromGit';
-const String dartVersionTag = 'dartSdkVersion';
 
 /// Exception class for when a process fails to run, so we can catch
 /// it and provide something more readable than a stack trace.
@@ -253,7 +251,7 @@ class ArchiveCreator {
   final HttpReader httpReader;
 
   late File _outputFile;
-  final Map<String, String> _version = <String, String>{};
+  late String _version;
   late String _flutter;
 
   /// Get the name of the channel as a string.
@@ -271,24 +269,21 @@ class ArchiveCreator {
     // unpacking it!) So, we use .zip for Mac, and the files are about
     // 220MB larger than they need to be. :-(
     final String suffix = platform.isLinux ? 'tar.xz' : 'zip';
-    return 'flutter_${os}_${_version[frameworkVersionTag]}-$branchName.$suffix';
+    return 'flutter_${os}_$_version-$branchName.$suffix';
   }
 
   /// Checks out the flutter repo and prepares it for other operations.
   ///
-  /// Returns the version for this release as obtained from the git tags, and
-  /// the dart version as obtained from `flutter --version`.
-  Future<Map<String, String>> initializeRepo() async {
+  /// Returns the version for this release, as obtained from the git tags.
+  Future<String> initializeRepo() async {
     await _checkoutFlutter();
-    if (_version.isEmpty) {
-      _version.addAll(await _getVersion());
-    }
+    _version = await _getVersion();
     return _version;
   }
 
   /// Performs all of the steps needed to create an archive.
   Future<File> createArchive() async {
-    assert(_version.isNotEmpty, 'Must run initializeRepo before createArchive');
+    assert(_version != null, 'Must run initializeRepo before createArchive');
     _outputFile = File(path.join(outputDir.absolute.path, _archiveName));
     await _installMinGitIfNeeded();
     await _populateCaches();
@@ -333,8 +328,8 @@ class ArchiveCreator {
     }
   }
 
-  /// Returns the version map of this release, according the to tags in the
-  /// repo and the output of `flutter --version --machine`.
+  /// Returns the version number of this release, according the to tags in the
+  /// repo.
   ///
   /// This looks for the tag attached to [revision] and, if it doesn't find one,
   /// git will give an error.
@@ -342,15 +337,10 @@ class ArchiveCreator {
   /// If [strict] is true, the exact [revision] must be tagged to return the
   /// version.  If [strict] is not true, will look backwards in time starting at
   /// [revision] to find the most recent version tag.
-  ///
-  /// The version found as a git tag is added to the information given by
-  /// `flutter --version --machine` with the `frameworkVersionFromGit` tag, and
-  /// returned.
-  Future<Map<String, String>> _getVersion() async {
-    String gitVersion;
+  Future<String> _getVersion() async {
     if (strict) {
       try {
-        gitVersion = await _runGit(<String>['describe', '--tags', '--exact-match', revision]);
+        return _runGit(<String>['describe', '--tags', '--exact-match', revision]);
       } on PreparePackageException catch (exception) {
         throw PreparePackageException(
           'Git error when checking for a version tag attached to revision $revision.\n'
@@ -359,18 +349,8 @@ class ArchiveCreator {
         );
       }
     } else {
-      gitVersion = await _runGit(<String>['describe', '--tags', '--abbrev=0', revision]);
+      return _runGit(<String>['describe', '--tags', '--abbrev=0', revision]);
     }
-    // Run flutter command twice, once to make sure the flutter command is built
-    // and ready (and thus won't output any junk on stdout the second time), and
-    // once to capture theJSON output. The second run should be fast.
-    await _runFlutter(<String>['--version', '--machine']);
-    final String versionJson = await _runFlutter(<String>['--version', '--machine']);
-    final Map<String, String> versionMap = <String, String>{};
-    final Map<String, dynamic> result = json.decode(versionJson) as Map<String, dynamic>;
-    result.forEach((String key, dynamic value) => versionMap[key] = value.toString());
-    versionMap[frameworkVersionTag] = gitVersion;
-    return versionMap;
   }
 
   /// Clone the Flutter repo and make sure that the git environment is sane
@@ -566,7 +546,7 @@ class ArchivePublisher {
   final String metadataGsPath;
   final Branch branch;
   final String revision;
-  final Map<String, String> version;
+  final String version;
   final Directory tempDir;
   final File outputFile;
   final ProcessRunner _processRunner;
@@ -621,8 +601,7 @@ class ArchivePublisher {
     final Map<String, dynamic> newEntry = <String, dynamic>{};
     newEntry['hash'] = revision;
     newEntry['channel'] = branchName;
-    newEntry['version'] = version[frameworkVersionTag];
-    newEntry['dart_sdk_version'] = version[dartVersionTag];
+    newEntry['version'] = version;
     newEntry['release_date'] = DateTime.now().toUtc().toIso8601String();
     newEntry['archive'] = destinationArchivePath;
     newEntry['sha256'] = await _getChecksum(outputFile);
@@ -651,25 +630,24 @@ class ArchivePublisher {
       path.join(tempDir.absolute.path, getMetadataFilename(platform)),
     );
     await _runGsUtil(<String>['cp', gsPath, metadataFile.absolute.path]);
-    Map<String, dynamic> jsonData = <String, dynamic>{};
     if (!dryRun) {
       final String currentMetadata = metadataFile.readAsStringSync();
       if (currentMetadata.isEmpty) {
         throw PreparePackageException('Empty metadata received from server');
       }
+
+      Map<String, dynamic> jsonData;
       try {
         jsonData = json.decode(currentMetadata) as Map<String, dynamic>;
       } on FormatException catch (e) {
         throw PreparePackageException('Unable to parse JSON metadata received from cloud: $e');
       }
-    }
-    // Run _addRelease, even on a dry run, so we can inspect the metadata on a
-    // dry run. On a dry run, the only thing in the metadata file be the new
-    // release.
-    jsonData = await _addRelease(jsonData);
 
-    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    metadataFile.writeAsStringSync(encoder.convert(jsonData));
+      jsonData = await _addRelease(jsonData);
+
+      const JsonEncoder encoder = JsonEncoder.withIndent('  ');
+      metadataFile.writeAsStringSync(encoder.convert(jsonData));
+    }
     await _cloudCopy(
       src: metadataFile.absolute.path,
       dest: gsPath,
@@ -854,7 +832,7 @@ Future<void> main(List<String> rawArguments) async {
   int exitCode = 0;
   late String message;
   try {
-    final Map<String, String> version = await creator.initializeRepo();
+    final String version = await creator.initializeRepo();
     final File outputFile = await creator.createArchive();
     if (parsedArguments['publish'] as bool) {
       final ArchivePublisher publisher = ArchivePublisher(

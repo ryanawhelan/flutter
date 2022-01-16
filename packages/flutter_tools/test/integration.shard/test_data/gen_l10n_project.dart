@@ -227,8 +227,6 @@ class Home extends StatelessWidget {
               "${localizations.doubleQuoteSelect('cabriolet')}",
               "${localizations.pluralInString(1)}",
               "${localizations.selectInString('he')}",
-              "${localizations.selectWithPlaceholder('male', 'ice cream')}",
-              "${localizations.selectWithPlaceholder('female', 'chocolate')}",
             ]);
           },
         ),
@@ -656,15 +654,6 @@ void main() {
     "description": "A select message with prefix and suffix strings.",
     "placeholders": {
       "gender": {}
-    }
-  },
-
-  "selectWithPlaceholder": "Indeed, {gender, select, male {he likes {preference}} female {she likes {preference}} other {they like {preference}}}!",
-  "@selectWithPlaceholder": {
-    "description": "A select message with prefix, suffix strings, and a placeholder.",
-    "placeholders": {
-      "gender": {},
-      "preference": {}
     }
   }
 }

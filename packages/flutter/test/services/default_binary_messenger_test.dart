@@ -41,7 +41,6 @@ void main() {
       (ByteData? message) async {
         expect(message, bar);
         countInbound += 1;
-        return null;
       },
     );
     expect(countInbound, equals(0));

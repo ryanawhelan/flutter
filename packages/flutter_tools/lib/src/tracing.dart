@@ -2,8 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// @dart = 2.8
+
 import 'dart:async';
 
+import 'package:meta/meta.dart';
 import 'package:vm_service/vm_service.dart' as vm_service;
 
 import 'base/common.dart';
@@ -21,8 +24,8 @@ const String kFirstFrameRasterizedEventName = 'Rasterized first useful frame';
 
 class Tracing {
   Tracing({
-    required this.vmService,
-    required Logger logger,
+    @required this.vmService,
+    @required Logger logger,
   }) : _logger = logger;
 
   static const String firstUsefulFrameEventName = kFirstFrameRasterizedEventName;
@@ -36,7 +39,7 @@ class Tracing {
   }
 
   /// Stops tracing; optionally wait for first frame.
-  Future<Map<String, Object?>> stopTracingAndDownloadTimeline({
+  Future<Map<String, dynamic>> stopTracingAndDownloadTimeline({
     bool awaitFirstFrame = false,
   }) async {
     if (awaitFirstFrame) {
@@ -59,10 +62,9 @@ class Tracing {
         bool done = false;
         final List<FlutterView> views = await vmService.getFlutterViews();
         for (final FlutterView view in views) {
-          final String? uiIsolateId = view.uiIsolate?.id;
-          if (uiIsolateId != null && await vmService
+          if (await vmService
               .flutterAlreadyPaintedFirstUsefulFrame(
-                isolateId: uiIsolateId,
+                isolateId: view.uiIsolate.id,
               )) {
             done = true;
             break;
@@ -78,15 +80,14 @@ class Tracing {
       }
       status.stop();
     }
-    final vm_service.Response? timeline = await vmService.getTimeline();
+    final vm_service.Response timeline = await vmService.getTimeline();
     await vmService.setTimelineFlags(<String>[]);
-    final Map<String, Object?>? timelineJson = timeline?.json;
-    if (timelineJson == null) {
+    if (timeline == null) {
       throwToolExit(
         'The device disconnected before the timeline could be retrieved.',
       );
     }
-    return timelineJson;
+    return timeline.json;
   }
 }
 
@@ -94,8 +95,8 @@ class Tracing {
 /// store it to `$output/start_up_info.json`.
 Future<void> downloadStartupTrace(FlutterVmService vmService, {
   bool awaitFirstFrame = true,
-  required Logger logger,
-  required Directory output,
+  @required Logger logger,
+  @required Directory output,
 }) async {
   final File traceInfoFile = output.childFile('start_up_info.json');
 
@@ -109,39 +110,33 @@ Future<void> downloadStartupTrace(FlutterVmService vmService, {
 
   final Tracing tracing = Tracing(vmService: vmService, logger: logger);
 
-  final Map<String, Object?> timeline = await tracing.stopTracingAndDownloadTimeline(
+  final Map<String, dynamic> timeline = await tracing.stopTracingAndDownloadTimeline(
     awaitFirstFrame: awaitFirstFrame,
   );
 
   final File traceTimelineFile = output.childFile('start_up_timeline.json');
   traceTimelineFile.writeAsStringSync(toPrettyJson(timeline));
 
-  int? extractInstantEventTimestamp(String eventName) {
-    final List<Object?>? traceEvents = timeline['traceEvents'] as List<Object?>?;
-    if (traceEvents == null) {
-      return null;
-    }
-    final List<Map<String, Object?>> events = List<Map<String, Object?>>.from(traceEvents);
-    Map<String, Object?>? matchedEvent;
-    for (final Map<String, Object?> event in events) {
-      if (event['name'] == eventName) {
-        matchedEvent = event;
-      }
-    }
-    return matchedEvent == null ? null : (matchedEvent['ts'] as int?);
+  int extractInstantEventTimestamp(String eventName) {
+    final List<Map<String, dynamic>> events =
+        List<Map<String, dynamic>>.from(timeline['traceEvents'] as List<dynamic>);
+    final Map<String, dynamic> event = events.firstWhere(
+      (Map<String, dynamic> event) => event['name'] == eventName, orElse: () => null,
+    );
+    return event == null ? null : (event['ts'] as int);
   }
 
   String message = 'No useful metrics were gathered.';
 
-  final int? engineEnterTimestampMicros = extractInstantEventTimestamp(kFlutterEngineMainEnterEventName);
-  final int? frameworkInitTimestampMicros = extractInstantEventTimestamp(kFrameworkInitEventName);
+  final int engineEnterTimestampMicros = extractInstantEventTimestamp(kFlutterEngineMainEnterEventName);
+  final int frameworkInitTimestampMicros = extractInstantEventTimestamp(kFrameworkInitEventName);
 
   if (engineEnterTimestampMicros == null) {
     logger.printTrace('Engine start event is missing in the timeline: $timeline');
     throwToolExit('Engine start event is missing in the timeline. Cannot compute startup time.');
   }
 
-  final Map<String, Object?> traceInfo = <String, Object?>{
+  final Map<String, dynamic> traceInfo = <String, dynamic>{
     'engineEnterTimestampMicros': engineEnterTimestampMicros,
   };
 
@@ -152,8 +147,8 @@ Future<void> downloadStartupTrace(FlutterVmService vmService, {
   }
 
   if (awaitFirstFrame) {
-    final int? firstFrameBuiltTimestampMicros = extractInstantEventTimestamp(kFirstFrameBuiltEventName);
-    final int? firstFrameRasterizedTimestampMicros = extractInstantEventTimestamp(kFirstFrameRasterizedEventName);
+    final int firstFrameBuiltTimestampMicros = extractInstantEventTimestamp(kFirstFrameBuiltEventName);
+    final int firstFrameRasterizedTimestampMicros = extractInstantEventTimestamp(kFirstFrameRasterizedEventName);
     if (firstFrameBuiltTimestampMicros == null || firstFrameRasterizedTimestampMicros == null) {
       logger.printTrace('First frame events are missing in the timeline: $timeline');
       throwToolExit('First frame events are missing in the timeline. Cannot compute startup time.');

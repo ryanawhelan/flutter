@@ -206,7 +206,6 @@ class TextPainter {
   /// in framework will automatically invoke this method.
   void markNeedsLayout() {
     _paragraph = null;
-    _lineMetricsCache = null;
     _previousCaretPosition = null;
     _previousCaretPrototype = null;
   }
@@ -391,7 +390,7 @@ class TextPainter {
     markNeedsLayout();
   }
 
-  /// {@macro dart.ui.textHeightBehavior}
+  /// {@macro flutter.dart:ui.textHeightBehavior}
   ui.TextHeightBehavior? get textHeightBehavior => _textHeightBehavior;
   ui.TextHeightBehavior? _textHeightBehavior;
   set textHeightBehavior(ui.TextHeightBehavior? value) {
@@ -780,7 +779,7 @@ class TextPainter {
 
       final double caretEnd = box.end;
       final double dx = box.direction == TextDirection.rtl ? caretEnd - caretPrototype.width : caretEnd;
-      return Rect.fromLTRB(dx.clamp(0, _paragraph!.width), box.top, dx.clamp(0, _paragraph!.width), box.bottom);
+      return Rect.fromLTRB(min(dx, _paragraph!.width), box.top, min(dx, _paragraph!.width), box.bottom);
     }
     return null;
   }
@@ -822,7 +821,7 @@ class TextPainter {
       final TextBox box = boxes.last;
       final double caretStart = box.start;
       final double dx = box.direction == TextDirection.rtl ? caretStart - caretPrototype.width : caretStart;
-      return Rect.fromLTRB(dx.clamp(0, _paragraph!.width), box.top, dx.clamp(0, _paragraph!.width), box.bottom);
+      return Rect.fromLTRB(min(dx, _paragraph!.width), box.top, min(dx, _paragraph!.width), box.bottom);
     }
     return null;
   }
@@ -976,7 +975,6 @@ class TextPainter {
     return _paragraph!.getLineBoundary(position);
   }
 
-  List<ui.LineMetrics>? _lineMetricsCache;
   /// Returns the full list of [LineMetrics] that describe in detail the various
   /// metrics of each laid out line.
   ///
@@ -988,8 +986,12 @@ class TextPainter {
   /// widgets to a particular line.
   ///
   /// Valid only after [layout] has been called.
+  ///
+  /// This can potentially return a large amount of data, so it is not recommended
+  /// to repeatedly call this. Instead, cache the results. The cached results
+  /// should be invalidated upon the next successful [layout].
   List<ui.LineMetrics> computeLineMetrics() {
     assert(!_debugNeedsLayout);
-    return  _lineMetricsCache ??= _paragraph!.computeLineMetrics();
+    return _paragraph!.computeLineMetrics();
   }
 }

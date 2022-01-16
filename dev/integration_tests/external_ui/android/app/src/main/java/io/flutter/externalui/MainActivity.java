@@ -11,24 +11,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.View;
-import androidx.annotation.NonNull;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.flutter.embedding.android.FlutterActivity;
-import io.flutter.embedding.android.FlutterSurfaceView;
-import io.flutter.embedding.android.FlutterView;
-import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.view.TextureRegistry;
 import io.flutter.view.TextureRegistry.SurfaceTextureEntry;
-import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity {
   private Surface surface;
@@ -41,9 +35,10 @@ public class MainActivity extends FlutterActivity {
   private AtomicInteger framesConsumed = new AtomicInteger(0);
 
   @Override
-  public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
-    GeneratedPluginRegistrant.registerWith(flutterEngine);
-    final MethodChannel channel = new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), "texture");
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    final MethodChannel channel = new MethodChannel(getFlutterView(), "texture");
     channel.setMethodCallHandler(new MethodCallHandler() {
       @Override
       public void onMethodCall(MethodCall methodCall, Result result) {
@@ -98,14 +93,11 @@ public class MainActivity extends FlutterActivity {
         }
       }
     });
-  }
 
-  @Override
-  public void onFlutterSurfaceViewCreated(@NonNull FlutterSurfaceView flutterSurfaceView) {
-    flutterSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+    getFlutterView().getHolder().addCallback(new SurfaceHolder.Callback() {
       @Override
       public void surfaceCreated(SurfaceHolder holder) {
-        final SurfaceTextureEntry textureEntry = flutterSurfaceView.getAttachedRenderer().createSurfaceTexture();
+        final SurfaceTextureEntry textureEntry = getFlutterView().createSurfaceTexture();
         texture = textureEntry.surfaceTexture();
         texture.setDefaultBufferSize(300, 200);
         surface = new Surface(texture);

@@ -1041,31 +1041,33 @@ class ListTile extends StatelessWidget {
   /// See also:
   ///
   ///  * [Divider], which you can use to obtain this effect manually.
-  static Iterable<Widget> divideTiles({ BuildContext? context, required Iterable<Widget> tiles, Color? color }) {
+  static Iterable<Widget> divideTiles({ BuildContext? context, required Iterable<Widget> tiles, Color? color }) sync* {
     assert(tiles != null);
     assert(color != null || context != null);
-    tiles = tiles.toList();
 
-    if (tiles.isEmpty || tiles.length == 1) {
-      return tiles;
-    }
+    final Iterator<Widget> iterator = tiles.iterator;
+    final bool hasNext = iterator.moveNext();
 
-    Widget wrapTile(Widget tile) {
-      return DecoratedBox(
+    if (!hasNext)
+      return;
+
+    final Decoration decoration = BoxDecoration(
+      border: Border(
+        bottom: Divider.createBorderSide(context, color: color),
+      ),
+    );
+
+    Widget tile = iterator.current;
+    while (iterator.moveNext()) {
+      yield DecoratedBox(
         position: DecorationPosition.foreground,
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: Divider.createBorderSide(context, color: color),
-          ),
-        ),
+        decoration: decoration,
         child: tile,
       );
+      tile = iterator.current;
     }
-
-    return <Widget>[
-      ...tiles.take(tiles.length - 1).map(wrapTile),
-      tiles.last,
-    ];
+    if (hasNext)
+      yield tile;
   }
 
   Color? _iconColor(ThemeData theme, ListTileThemeData tileTheme) {
@@ -1264,7 +1266,7 @@ enum _ListTileSlot {
   trailing,
 }
 
-class _ListTile extends RenderObjectWidget with SlottedMultiChildRenderObjectWidgetMixin<_ListTileSlot> {
+class _ListTile extends RenderObjectWidget {
   const _ListTile({
     Key? key,
     this.leading,
@@ -1305,21 +1307,7 @@ class _ListTile extends RenderObjectWidget with SlottedMultiChildRenderObjectWid
   final double minLeadingWidth;
 
   @override
-  Iterable<_ListTileSlot> get slots => _ListTileSlot.values;
-
-  @override
-  Widget? childForSlot(_ListTileSlot slot) {
-    switch (slot) {
-      case _ListTileSlot.leading:
-        return leading;
-      case _ListTileSlot.title:
-        return title;
-      case _ListTileSlot.subtitle:
-        return subtitle;
-      case _ListTileSlot.trailing:
-        return trailing;
-    }
-  }
+  _ListTileElement createElement() => _ListTileElement(this);
 
   @override
   _RenderListTile createRenderObject(BuildContext context) {
@@ -1351,7 +1339,111 @@ class _ListTile extends RenderObjectWidget with SlottedMultiChildRenderObjectWid
   }
 }
 
-class _RenderListTile extends RenderBox with SlottedContainerRenderObjectMixin<_ListTileSlot> {
+class _ListTileElement extends RenderObjectElement {
+  _ListTileElement(_ListTile widget) : super(widget);
+
+  final Map<_ListTileSlot, Element> slotToChild = <_ListTileSlot, Element>{};
+
+  @override
+  _ListTile get widget => super.widget as _ListTile;
+
+  @override
+  _RenderListTile get renderObject => super.renderObject as _RenderListTile;
+
+  @override
+  void visitChildren(ElementVisitor visitor) {
+    slotToChild.values.forEach(visitor);
+  }
+
+  @override
+  void forgetChild(Element child) {
+    assert(slotToChild.containsValue(child));
+    assert(child.slot is _ListTileSlot);
+    assert(slotToChild.containsKey(child.slot));
+    slotToChild.remove(child.slot);
+    super.forgetChild(child);
+  }
+
+  void _mountChild(Widget? widget, _ListTileSlot slot) {
+    final Element? oldChild = slotToChild[slot];
+    final Element? newChild = updateChild(oldChild, widget, slot);
+    if (oldChild != null) {
+      slotToChild.remove(slot);
+    }
+    if (newChild != null) {
+      slotToChild[slot] = newChild;
+    }
+  }
+
+  @override
+  void mount(Element? parent, Object? newSlot) {
+    super.mount(parent, newSlot);
+    _mountChild(widget.leading, _ListTileSlot.leading);
+    _mountChild(widget.title, _ListTileSlot.title);
+    _mountChild(widget.subtitle, _ListTileSlot.subtitle);
+    _mountChild(widget.trailing, _ListTileSlot.trailing);
+  }
+
+  void _updateChild(Widget? widget, _ListTileSlot slot) {
+    final Element? oldChild = slotToChild[slot];
+    final Element? newChild = updateChild(oldChild, widget, slot);
+    if (oldChild != null) {
+      slotToChild.remove(slot);
+    }
+    if (newChild != null) {
+      slotToChild[slot] = newChild;
+    }
+  }
+
+  @override
+  void update(_ListTile newWidget) {
+    super.update(newWidget);
+    assert(widget == newWidget);
+    _updateChild(widget.leading, _ListTileSlot.leading);
+    _updateChild(widget.title, _ListTileSlot.title);
+    _updateChild(widget.subtitle, _ListTileSlot.subtitle);
+    _updateChild(widget.trailing, _ListTileSlot.trailing);
+  }
+
+  void _updateRenderObject(RenderBox? child, _ListTileSlot slot) {
+    switch (slot) {
+      case _ListTileSlot.leading:
+        renderObject.leading = child;
+        break;
+      case _ListTileSlot.title:
+        renderObject.title = child;
+        break;
+      case _ListTileSlot.subtitle:
+        renderObject.subtitle = child;
+        break;
+      case _ListTileSlot.trailing:
+        renderObject.trailing = child;
+        break;
+    }
+  }
+
+  @override
+  void insertRenderObjectChild(RenderObject child, _ListTileSlot slot) {
+    assert(child is RenderBox);
+    _updateRenderObject(child as RenderBox, slot);
+    assert(renderObject.children.keys.contains(slot));
+  }
+
+  @override
+  void removeRenderObjectChild(RenderObject child, _ListTileSlot slot) {
+    assert(child is RenderBox);
+    assert(renderObject.children[slot] == child);
+    _updateRenderObject(null, slot);
+    assert(!renderObject.children.keys.contains(slot));
+  }
+
+  @override
+  void moveRenderObjectChild(RenderObject child, Object? oldSlot, Object? newSlot) {
+    assert(false, 'not reachable');
+  }
+}
+
+class _RenderListTile extends RenderBox {
   _RenderListTile({
     required bool isDense,
     required VisualDensity visualDensity,
@@ -1380,24 +1472,54 @@ class _RenderListTile extends RenderBox with SlottedContainerRenderObjectMixin<_
        _minVerticalPadding = minVerticalPadding,
        _minLeadingWidth = minLeadingWidth;
 
-  RenderBox? get leading => childForSlot(_ListTileSlot.leading);
-  RenderBox? get title => childForSlot(_ListTileSlot.title);
-  RenderBox? get subtitle => childForSlot(_ListTileSlot.subtitle);
-  RenderBox? get trailing => childForSlot(_ListTileSlot.trailing);
+  final Map<_ListTileSlot, RenderBox> children = <_ListTileSlot, RenderBox>{};
+
+  RenderBox? _updateChild(RenderBox? oldChild, RenderBox? newChild, _ListTileSlot slot) {
+    if (oldChild != null) {
+      dropChild(oldChild);
+      children.remove(slot);
+    }
+    if (newChild != null) {
+      children[slot] = newChild;
+      adoptChild(newChild);
+    }
+    return newChild;
+  }
+
+  RenderBox? _leading;
+  RenderBox? get leading => _leading;
+  set leading(RenderBox? value) {
+    _leading = _updateChild(_leading, value, _ListTileSlot.leading);
+  }
+
+  RenderBox? _title;
+  RenderBox? get title => _title;
+  set title(RenderBox? value) {
+    _title = _updateChild(_title, value, _ListTileSlot.title);
+  }
+
+  RenderBox? _subtitle;
+  RenderBox? get subtitle => _subtitle;
+  set subtitle(RenderBox? value) {
+    _subtitle = _updateChild(_subtitle, value, _ListTileSlot.subtitle);
+  }
+
+  RenderBox? _trailing;
+  RenderBox? get trailing => _trailing;
+  set trailing(RenderBox? value) {
+    _trailing = _updateChild(_trailing, value, _ListTileSlot.trailing);
+  }
 
   // The returned list is ordered for hit testing.
-  @override
-  Iterable<RenderBox> get children {
-    return <RenderBox>[
-      if (leading != null)
-        leading!,
-      if (title != null)
-        title!,
-      if (subtitle != null)
-        subtitle!,
-      if (trailing != null)
-        trailing!,
-    ];
+  Iterable<RenderBox> get _children sync* {
+    if (leading != null)
+      yield leading!;
+    if (title != null)
+      yield title!;
+    if (subtitle != null)
+      yield subtitle!;
+    if (trailing != null)
+      yield trailing!;
   }
 
   bool get isDense => _isDense;
@@ -1491,6 +1613,44 @@ class _RenderListTile extends RenderBox with SlottedContainerRenderObjectMixin<_
       return;
     _minLeadingWidth = value;
     markNeedsLayout();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    for (final RenderBox child in _children)
+      child.attach(owner);
+  }
+
+  @override
+  void detach() {
+    super.detach();
+    for (final RenderBox child in _children)
+      child.detach();
+  }
+
+  @override
+  void redepthChildren() {
+    _children.forEach(redepthChild);
+  }
+
+  @override
+  void visitChildren(RenderObjectVisitor visitor) {
+    _children.forEach(visitor);
+  }
+
+  @override
+  List<DiagnosticsNode> debugDescribeChildren() {
+    final List<DiagnosticsNode> value = <DiagnosticsNode>[];
+    void add(RenderBox? child, String name) {
+      if (child != null)
+        value.add(child.toDiagnosticsNode(name: name));
+    }
+    add(leading, 'leading');
+    add(title, 'title');
+    add(subtitle, 'subtitle');
+    add(trailing, 'trailing');
+    return value;
   }
 
   @override
@@ -1745,7 +1905,7 @@ class _RenderListTile extends RenderBox with SlottedContainerRenderObjectMixin<_
   @override
   bool hitTestChildren(BoxHitTestResult result, { required Offset position }) {
     assert(position != null);
-    for (final RenderBox child in children) {
+    for (final RenderBox child in _children) {
       final BoxParentData parentData = child.parentData! as BoxParentData;
       final bool isHit = result.addWithPaintOffset(
         offset: parentData.offset,

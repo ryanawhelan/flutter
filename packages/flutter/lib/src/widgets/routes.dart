@@ -129,9 +129,7 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
   //
   // This situation arises when dealing with the Cupertino dismiss gesture.
   @override
-  bool get finishedWhenPopped => _controller!.status == AnimationStatus.dismissed && !_popFinalized;
-
-  bool _popFinalized = false;
+  bool get finishedWhenPopped => _controller!.status == AnimationStatus.dismissed;
 
   /// The animation that drives the route's transition and the previous route's
   /// forward transition.
@@ -208,7 +206,6 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
         // removing the route and disposing it.
         if (!isActive) {
           navigator!.finalizeRoute(this);
-          _popFinalized = true;
         }
         break;
     }
@@ -1405,7 +1402,7 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   Future<RoutePopDisposition> willPop() async {
     final _ModalScopeState<T>? scope = _scopeKey.currentState;
     assert(scope != null);
-    for (final WillPopCallback callback in List<WillPopCallback>.of(_willPopCallbacks)) {
+    for (final WillPopCallback callback in List<WillPopCallback>.from(_willPopCallbacks)) {
       if (await callback() != true)
         return RoutePopDisposition.doNotPop;
     }
@@ -1634,11 +1631,9 @@ abstract class ModalRoute<T> extends TransitionRoute<T> with LocalHistoryRoute<T
   late OverlayEntry _modalScope;
 
   @override
-  Iterable<OverlayEntry> createOverlayEntries() {
-    return <OverlayEntry>[
-      _modalBarrier = OverlayEntry(builder: _buildModalBarrier),
-      _modalScope = OverlayEntry(builder: _buildModalScope, maintainState: maintainState),
-    ];
+  Iterable<OverlayEntry> createOverlayEntries() sync* {
+    yield _modalBarrier = OverlayEntry(builder: _buildModalBarrier);
+    yield _modalScope = OverlayEntry(builder: _buildModalScope, maintainState: maintainState);
   }
 
   @override

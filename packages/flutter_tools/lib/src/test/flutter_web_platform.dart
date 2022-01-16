@@ -484,6 +484,10 @@ class FlutterWebPlatform extends PlatformPlugin {
     return suite;
   }
 
+  @override
+  StreamChannel<dynamic> loadChannel(String path, SuitePlatform platform) =>
+      throw UnimplementedError();
+
   /// Returns the [BrowserManager] for [runtime], which should be a browser.
   ///
   /// If no browser manager is running yet, starts one.

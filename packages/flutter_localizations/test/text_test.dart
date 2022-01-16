@@ -22,7 +22,9 @@ void main() {
             return const Text('Next');
           },
         },
-        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+          GlobalMaterialLocalizations.delegate,
+        ],
         supportedLocales: const <Locale>[
           Locale('en', 'US'),
           Locale('es', 'ES'),
@@ -106,7 +108,9 @@ void main() {
             return const Text('Next');
           },
         },
-        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+          GlobalMaterialLocalizations.delegate,
+        ],
         supportedLocales: const <Locale>[
           Locale('en', 'US'),
           Locale('es', 'ES'),

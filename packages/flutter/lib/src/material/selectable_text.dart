@@ -123,8 +123,6 @@ class _SelectableTextSelectionGestureDetectorBuilder extends TextSelectionGestur
 /// behavior is useful, for example, to make the text bold while using the
 /// default font family and size.
 ///
-/// {@macro flutter.material.textfield.wantKeepAlive}
-///
 /// {@tool snippet}
 ///
 /// ```dart
@@ -416,7 +414,7 @@ class SelectableText extends StatefulWidget {
   /// {@macro flutter.widgets.Text.semanticsLabel}
   final String? semanticsLabel;
 
-  /// {@macro dart.ui.textHeightBehavior}
+  /// {@macro flutter.dart:ui.textHeightBehavior}
   final TextHeightBehavior? textHeightBehavior;
 
   /// {@macro flutter.painting.textPainter.textWidthBasis}
@@ -453,7 +451,7 @@ class SelectableText extends StatefulWidget {
   }
 }
 
-class _SelectableTextState extends State<SelectableText> implements TextSelectionGestureDetectorBuilderDelegate {
+class _SelectableTextState extends State<SelectableText> with AutomaticKeepAliveClientMixin implements TextSelectionGestureDetectorBuilderDelegate {
   EditableTextState? get _editableText => editableTextKey.currentState;
 
   late _TextSpanEditingController _controller;
@@ -582,7 +580,11 @@ class _SelectableTextState extends State<SelectableText> implements TextSelectio
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // See AutomaticKeepAliveClientMixin.
     // TODO(garyq): Assert to block WidgetSpans from being used here are removed,
     // but we still do not yet have nice handling of things like carets, clipboard,
     // and other features. We should add proper support. Currently, caret handling

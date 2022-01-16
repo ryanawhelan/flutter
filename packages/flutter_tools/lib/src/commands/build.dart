@@ -2,13 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// @dart = 2.8
+
 import 'package:meta/meta.dart';
 
 import '../build_info.dart';
 import '../commands/build_linux.dart';
 import '../commands/build_macos.dart';
 import '../commands/build_windows.dart';
-import '../globals.dart' as globals;
+import '../globals_null_migrated.dart' as globals;
 import '../runner/flutter_command.dart';
 import 'build_aar.dart';
 import 'build_apk.dart';
@@ -59,13 +61,12 @@ class BuildCommand extends FlutterCommand {
   String get category => FlutterCommandCategory.project;
 
   @override
-  Future<FlutterCommandResult> runCommand() async => FlutterCommandResult.fail();
+  Future<FlutterCommandResult> runCommand() async => null;
 }
 
 abstract class BuildSubCommand extends FlutterCommand {
-  BuildSubCommand({required bool verboseHelp}) {
+  BuildSubCommand() {
     requiresPubspecYaml();
-    usesFatalWarningsOption(verboseHelp: verboseHelp);
   }
 
   @override

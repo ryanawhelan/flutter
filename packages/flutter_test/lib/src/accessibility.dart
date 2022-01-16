@@ -95,9 +95,6 @@ class MinimumTapTargetGuideline extends AccessibilityGuideline {
         && !data.hasAction(ui.SemanticsAction.tap))
         || data.hasFlag(ui.SemanticsFlag.isHidden))
         return result;
-      // Skip links https://www.w3.org/WAI/WCAG21/Understanding/target-size.html
-      if (data.hasFlag(ui.SemanticsFlag.isLink))
-        return result;
       Rect paintBounds = node.rect;
       SemanticsNode? current = node;
       while (current != null) {
@@ -212,10 +209,7 @@ class MinimumTextContrastGuideline extends AccessibilityGuideline {
 
     Future<Evaluation> evaluateNode(SemanticsNode node) async {
       Evaluation result = const Evaluation.pass();
-      if (node.isInvisible ||
-          node.isMergedIntoParent ||
-          node.hasFlag(ui.SemanticsFlag.isHidden) ||
-          (node.hasFlag(ui.SemanticsFlag.hasEnabledState) && !node.hasFlag(ui.SemanticsFlag.isEnabled)))
+      if (node.isInvisible || node.isMergedIntoParent || node.hasFlag(ui.SemanticsFlag.isHidden))
         return result;
       final SemanticsData data = node.getSemanticsData();
       final List<SemanticsNode> children = <SemanticsNode>[];

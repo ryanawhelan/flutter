@@ -31,8 +31,6 @@ export 'package:flutter/services.dart' show SmartQuotesType, SmartDashesType;
 /// If a [controller] is not specified, [initialValue] can be used to give
 /// the automatically generated controller an initial value.
 ///
-/// {@macro flutter.material.textfield.wantKeepAlive}
-///
 /// Remember to call [TextEditingController.dispose] of the [TextEditingController]
 /// when it is no longer needed. This will ensure we discard any resources used
 /// by the object.
@@ -143,7 +141,7 @@ class TextFormField extends FormField<String> {
     Color? cursorColor,
     Brightness? keyboardAppearance,
     EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
-    bool? enableInteractiveSelection,
+    bool enableInteractiveSelection = true,
     TextSelectionControls? selectionControls,
     InputCounterWidgetBuilder? buildCounter,
     ScrollPhysics? scrollPhysics,
@@ -179,6 +177,7 @@ class TextFormField extends FormField<String> {
        ),
        assert(!obscureText || maxLines == 1, 'Obscured fields cannot be multiline.'),
        assert(maxLength == null || maxLength == TextField.noMaxLength || maxLength > 0),
+       assert(enableInteractiveSelection != null),
        assert(enableIMEPersonalizedLearning != null),
        super(
          key: key,
@@ -242,7 +241,7 @@ class TextFormField extends FormField<String> {
                scrollPadding: scrollPadding,
                scrollPhysics: scrollPhysics,
                keyboardAppearance: keyboardAppearance,
-               enableInteractiveSelection: enableInteractiveSelection ?? (!obscureText || !readOnly),
+               enableInteractiveSelection: enableInteractiveSelection,
                selectionControls: selectionControls,
                buildCounter: buildCounter,
                autofillHints: autofillHints,

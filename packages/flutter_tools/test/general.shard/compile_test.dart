@@ -88,17 +88,4 @@ void main() {
       '--enable-asserts',
     ]);
   });
-
-  testWithoutContext('buildModeOptions removes matching profile define', () {
-    expect(buildModeOptions(BuildMode.debug, <String>['dart.vm.profile=true']), <String>[
-      '-Ddart.vm.product=false',
-      '--enable-asserts',
-    ]);
-  });
-
-  testWithoutContext('buildModeOptions removes both matching profile and release define', () {
-    expect(buildModeOptions(BuildMode.debug, <String>['dart.vm.profile=true', 'dart.vm.product=true']), <String>[
-      '--enable-asserts',
-    ]);
-  });
 }

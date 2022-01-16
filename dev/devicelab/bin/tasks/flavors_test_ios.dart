@@ -4,15 +4,9 @@
 
 import 'package:flutter_devicelab/framework/devices.dart';
 import 'package:flutter_devicelab/framework/framework.dart';
-import 'package:flutter_devicelab/framework/task_result.dart';
 import 'package:flutter_devicelab/tasks/integration_tests.dart';
 
 Future<void> main() async {
   deviceOperatingSystem = DeviceOperatingSystem.ios;
-  await task(() async {
-    await createFlavorsTest().call();
-    await createIntegrationTestFlavorsTest().call();
-
-    return TaskResult.success(null);
-  });
+  await task(createFlavorsTest());
 }
