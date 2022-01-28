@@ -373,19 +373,17 @@ void main() {
 
     List<TextStyle> extractStyles(TextTheme textTheme) {
       return <TextStyle>[
-        textTheme.displayLarge!,
-        textTheme.displayMedium!,
-        textTheme.displaySmall!,
-        textTheme.headlineLarge!,
-        textTheme.headlineMedium!,
-        textTheme.headlineSmall!,
-        textTheme.titleLarge!,
-        textTheme.titleMedium!,
-        textTheme.bodyLarge!,
-        textTheme.bodyMedium!,
-        textTheme.bodySmall!,
-        textTheme.labelLarge!,
-        textTheme.labelMedium!,
+        textTheme.headline1!,
+        textTheme.headline2!,
+        textTheme.headline3!,
+        textTheme.headline4!,
+        textTheme.headline5!,
+        textTheme.headline6!,
+        textTheme.subtitle1!,
+        textTheme.bodyText1!,
+        textTheme.bodyText2!,
+        textTheme.caption!,
+        textTheme.button!,
       ];
     }
 
@@ -410,7 +408,7 @@ void main() {
       }
     }
 
-    expect(theme.textTheme.displayLarge!.debugLabel, '(englishLike displayLarge 2014).merge(blackMountainView displayLarge)');
+    expect(theme.textTheme.headline1!.debugLabel, '(englishLike display4 2014).merge(blackMountainView headline1)');
   });
 
   group('Cupertino theme', () {

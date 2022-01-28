@@ -1621,7 +1621,6 @@ void main() {
     addTearDown(gesture.removePointer);
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.mouseCursor, (_) async {
       logCursors.add('cursor');
-      return null;
     });
 
     final GlobalKey key = GlobalKey();

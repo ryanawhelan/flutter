@@ -13,7 +13,7 @@ void main() {
   late DateTime initialDate;
 
   setUp(() {
-    firstDate = DateTime(2001);
+    firstDate = DateTime(2001, DateTime.january);
     lastDate = DateTime(2031, DateTime.december, 31);
     initialDate = DateTime(2016, DateTime.january, 15);
   });

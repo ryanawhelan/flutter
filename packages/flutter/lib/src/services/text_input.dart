@@ -468,7 +468,6 @@ class TextInputConfiguration {
     this.textCapitalization = TextCapitalization.none,
     this.autofillConfiguration = AutofillConfiguration.disabled,
     this.enableIMEPersonalizedLearning = true,
-    this.contentCommitMimeTypes = const <String>[],
     this.enableDeltaModel = false,
   }) : assert(inputType != null),
        assert(obscureText != null),
@@ -480,7 +479,6 @@ class TextInputConfiguration {
        assert(inputAction != null),
        assert(textCapitalization != null),
        assert(enableIMEPersonalizedLearning != null),
-       assert(contentCommitMimeTypes != null),
        assert(enableDeltaModel != null);
 
   /// The type of information for which to optimize the text input control.
@@ -611,47 +609,6 @@ class TextInputConfiguration {
   /// {@endtemplate}
   final bool enableIMEPersonalizedLearning;
 
-  /// Used when a user inserts image-based content through the device keyboard
-  /// on Android only.
-  ///
-  /// The passed list of strings will determine which MIME types are allowed to
-  /// be inserted via the device keyboard
-  ///
-  /// This example shows how to limit your keyboard commits to specific file types
-  /// `TextField`.
-  ///
-  /// ```dart
-  /// final TextEditingController _controller = TextEditingController();
-  ///
-  /// @override
-  /// void dispose() {
-  ///   _controller.dispose();
-  ///   super.dispose();
-  /// }
-  ///
-  /// @override
-  /// Widget build(BuildContext context) {
-  ///   return Scaffold(
-  ///     body: Column(
-  ///       mainAxisAlignment: MainAxisAlignment.center,
-  ///       children: <Widget>[
-  ///         const Text('Here's a text field that supports inserting gif content:'),
-  ///         TextField(
-  ///           controller: _controller,
-  ///           contentCommitMimeTypes: ['image/gif', 'image/png'],
-  ///           onContentCommitted: (CommittedContent data) async {
-  ///             ...
-  ///           },
-  ///         ),
-  ///       ],
-  ///     ),
-  ///   );
-  /// }
-  /// ```
-  /// {@end-tool}
-  /// {@endtemplate}
-  final List<String> contentCommitMimeTypes;
-
   /// Creates a copy of this [TextInputConfiguration] with the given fields
   /// replaced with new values.
   TextInputConfiguration copyWith({
@@ -668,7 +625,6 @@ class TextInputConfiguration {
     TextCapitalization? textCapitalization,
     bool? enableIMEPersonalizedLearning,
     AutofillConfiguration? autofillConfiguration,
-    List<String>? contentCommitMimeTypes,
     bool? enableDeltaModel,
   }) {
     return TextInputConfiguration(
@@ -685,7 +641,6 @@ class TextInputConfiguration {
       enableIMEPersonalizedLearning: enableIMEPersonalizedLearning?? this.enableIMEPersonalizedLearning,
       autofillConfiguration: autofillConfiguration ?? this.autofillConfiguration,
       enableDeltaModel: enableDeltaModel ?? this.enableDeltaModel,
-      contentCommitMimeTypes: contentCommitMimeTypes ?? this.contentCommitMimeTypes
     );
   }
 
@@ -732,7 +687,6 @@ class TextInputConfiguration {
       'enableIMEPersonalizedLearning': enableIMEPersonalizedLearning,
       if (autofill != null) 'autofill': autofill,
       'enableDeltaModel' : enableDeltaModel,
-      'contentCommitMimeTypes': contentCommitMimeTypes
     };
   }
 }
@@ -790,9 +744,6 @@ class TextEditingValue {
   ///
   /// The [text], [selection], and [composing] arguments must not be null but
   /// each have default values.
-  ///
-  /// The default value of [selection] is `TextSelection.collapsed(offset: -1)`.
-  /// This indicates that there is no selection at all.
   const TextEditingValue({
     this.text = '',
     this.selection = const TextSelection.collapsed(offset: -1),
@@ -882,55 +833,6 @@ class TextEditingValue {
   /// it usually indicates the current [composing] range is invalid because of a
   /// programming error.
   bool get isComposingRangeValid => composing.isValid && composing.isNormalized && composing.end <= text.length;
-
-  /// Returns a new [TextEditingValue], which is this [TextEditingValue] with
-  /// its [text] partially replaced by the `replacementString`.
-  ///
-  /// The `replacementRange` parameter specifies the range of the
-  /// [TextEditingValue.text] that needs to be replaced.
-  ///
-  /// The `replacementString` parameter specifies the string to replace the
-  /// given range of text with.
-  ///
-  /// This method also adjusts the selection range and the composing range of the
-  /// resulting [TextEditingValue], such that they point to the same substrings
-  /// as the correspoinding ranges in the original [TextEditingValue]. For
-  /// example, if the original [TextEditingValue] is "Hello world" with the word
-  /// "world" selected, replacing "Hello" with a different string using this
-  /// method will not change the selected word.
-  ///
-  /// This method does nothing if the given `replacementRange` is not
-  /// [TextRange.isValid].
-  TextEditingValue replaced(TextRange replacementRange, String replacementString) {
-    if (!replacementRange.isValid) {
-      return this;
-    }
-    final String newText = text.replaceRange(replacementRange.start, replacementRange.end, replacementString);
-
-    if (replacementRange.end - replacementRange.start == replacementString.length) {
-      return copyWith(text: newText);
-    }
-
-    int adjustIndex(int originalIndex) {
-      // The length added by adding the replacementString.
-      final int replacedLength = originalIndex <= replacementRange.start && originalIndex < replacementRange.end ? 0 : replacementString.length;
-      // The length removed by removing the replacementRange.
-      final int removedLength = originalIndex.clamp(replacementRange.start, replacementRange.end) - replacementRange.start;
-      return originalIndex + replacedLength - removedLength;
-    }
-
-    return TextEditingValue(
-      text: newText,
-      selection: TextSelection(
-        baseOffset: adjustIndex(selection.baseOffset),
-        extentOffset: adjustIndex(selection.extentOffset),
-      ),
-      composing: TextRange(
-        start: adjustIndex(composing.start),
-        end: adjustIndex(composing.end),
-      ),
-    );
-  }
 
   /// Returns a representation of this object as a JSON object.
   Map<String, dynamic> toJSON() {

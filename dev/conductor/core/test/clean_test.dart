@@ -15,7 +15,6 @@ void main() {
   group('clean command', () {
     const String flutterRoot = '/flutter';
     const String checkoutsParentDirectory = '$flutterRoot/dev/tools/';
-    const String stateFilePath = '/state-file.json';
 
     late MemoryFileSystem fileSystem;
     late FakePlatform platform;
@@ -48,36 +47,24 @@ void main() {
     });
 
     test('throws if no state file found', () async {
+      const String stateFile = '/state-file.json';
+
       await expectLater(
         () async => runner.run(<String>[
           'clean',
           '--$kStateOption',
-          stateFilePath,
+          stateFile,
           '--$kYesFlag',
         ]),
         throwsExceptionWith(
-          'No persistent state file found at $stateFilePath',
+          'No persistent state file found at $stateFile',
         ),
       );
     });
 
-    test('deletes an empty state file', () async {
-      final File stateFile = fileSystem.file(stateFilePath);
-      stateFile.writeAsStringSync('');
-
-      await runner.run(<String>[
-        'clean',
-        '--$kStateOption',
-        stateFile.path,
-        '--$kYesFlag',
-      ]);
-
-      expect(stateFile.existsSync(), false);
-    });
-
-    test('deletes a state file with content', () async {
-      final File stateFile = fileSystem.file(stateFilePath);
-      stateFile.writeAsStringSync('{status: pending}');
+    test('deletes state file', () async {
+      final File stateFile = fileSystem.file('/state-file.json');
+      stateFile.writeAsStringSync('{}');
 
       await runner.run(<String>[
         'clean',

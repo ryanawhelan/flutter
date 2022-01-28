@@ -89,9 +89,9 @@ class PointerSignalResolver {
     } catch (exception, stack) {
       InformationCollector? collector;
       assert(() {
-        collector = () => <DiagnosticsNode>[
-          DiagnosticsProperty<PointerSignalEvent>('Event', event, style: DiagnosticsTreeStyle.errorProperty),
-        ];
+        collector = () sync* {
+          yield DiagnosticsProperty<PointerSignalEvent>('Event', event, style: DiagnosticsTreeStyle.errorProperty);
+        };
         return true;
       }());
       FlutterError.reportError(FlutterErrorDetails(

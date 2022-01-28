@@ -36,7 +36,7 @@ void main() {
   });
 
   test('Expect thrown exception with statusCode - evicts from cache and drains', () async {
-    const int errorStatusCode = HttpStatus.notFound;
+    final int errorStatusCode = HttpStatus.notFound;
     const String requestUrl = 'foo-url';
 
     httpClient.request.response.statusCode = errorStatusCode;

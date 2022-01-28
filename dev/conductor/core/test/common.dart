@@ -34,7 +34,7 @@ class TestStdio extends Stdio {
   TestStdio({
     this.verbose = false,
     List<String>? stdin,
-  }) : stdin = stdin ?? <String>[];
+  }) : _stdin = stdin ?? <String>[];
 
   String get error => logs.where((String log) => log.startsWith(r'[error] ')).join('\n');
 
@@ -43,14 +43,15 @@ class TestStdio extends Stdio {
   }).join('\n');
 
   final bool verbose;
-  final List<String> stdin;
+  late final List<String> _stdin;
+  List<String> get stdin => _stdin;
 
   @override
   String readLineSync() {
-    if (stdin.isEmpty) {
-      throw Exception('Unexpected call to readLineSync! Last stdout was ${logs.last}');
+    if (_stdin.isEmpty) {
+      throw Exception('Unexpected call to readLineSync!');
     }
-    return stdin.removeAt(0);
+    return _stdin.removeAt(0);
   }
 }
 

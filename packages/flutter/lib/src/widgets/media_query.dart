@@ -105,8 +105,7 @@ class MediaQueryData {
     this.disableAnimations = false,
     this.boldText = false,
     this.navigationMode = NavigationMode.traditional,
-    this.gestureSettings = const DeviceGestureSettings(touchSlop: kTouchSlop),
-    this.displayFeatures = const <ui.DisplayFeature>[],
+    this.gestureSettings = const DeviceGestureSettings(touchSlop: kTouchSlop)
   }) : assert(size != null),
        assert(devicePixelRatio != null),
        assert(textScaleFactor != null),
@@ -122,8 +121,7 @@ class MediaQueryData {
        assert(disableAnimations != null),
        assert(boldText != null),
        assert(navigationMode != null),
-       assert(gestureSettings != null),
-       assert(displayFeatures != null);
+       assert(gestureSettings != null);
 
   /// Creates data for a media query based on the given window.
   ///
@@ -148,8 +146,7 @@ class MediaQueryData {
       highContrast = window.accessibilityFeatures.highContrast,
       alwaysUse24HourFormat = window.alwaysUse24HourFormat,
       navigationMode = NavigationMode.traditional,
-      gestureSettings = DeviceGestureSettings.fromWindow(window),
-      displayFeatures = window.displayFeatures;
+      gestureSettings = DeviceGestureSettings.fromWindow(window);
 
   /// The size of the media in logical pixels (e.g, the size of the screen).
   ///
@@ -354,17 +351,6 @@ class MediaQueryData {
   /// gesture behavior over the framework constants.
   final DeviceGestureSettings gestureSettings;
 
-  /// {@macro dart.ui.ViewConfiguration.displayFeatures}
-  ///
-  /// See also:
-  ///
-  ///  * [dart:ui.DisplayFeatureType], which lists the different types of
-  ///  display features and explains the differences between them.
-  ///  * [dart:ui.DisplayFeatureState], which lists the possible states for
-  ///  folding features ([dart:ui.DisplayFeatureType.fold] and
-  ///  [dart:ui.DisplayFeatureType.hinge]).
-  final List<ui.DisplayFeature> displayFeatures;
-
   /// The orientation of the media (e.g., whether the device is in landscape or
   /// portrait mode).
   Orientation get orientation {
@@ -390,7 +376,6 @@ class MediaQueryData {
     bool? boldText,
     NavigationMode? navigationMode,
     DeviceGestureSettings? gestureSettings,
-    List<ui.DisplayFeature>? displayFeatures,
   }) {
     return MediaQueryData(
       size: size ?? this.size,
@@ -409,7 +394,6 @@ class MediaQueryData {
       boldText: boldText ?? this.boldText,
       navigationMode: navigationMode ?? this.navigationMode,
       gestureSettings: gestureSettings ?? this.gestureSettings,
-      displayFeatures: displayFeatures ?? this.displayFeatures,
     );
   }
 
@@ -461,7 +445,6 @@ class MediaQueryData {
       accessibleNavigation: accessibleNavigation,
       boldText: boldText,
       gestureSettings: gestureSettings,
-      displayFeatures: displayFeatures,
     );
   }
 
@@ -511,7 +494,6 @@ class MediaQueryData {
       accessibleNavigation: accessibleNavigation,
       boldText: boldText,
       gestureSettings: gestureSettings,
-      displayFeatures: displayFeatures,
     );
   }
 
@@ -561,7 +543,6 @@ class MediaQueryData {
       accessibleNavigation: accessibleNavigation,
       boldText: boldText,
       gestureSettings: gestureSettings,
-      displayFeatures: displayFeatures,
     );
   }
 
@@ -584,8 +565,7 @@ class MediaQueryData {
         && other.accessibleNavigation == accessibleNavigation
         && other.boldText == boldText
         && other.navigationMode == navigationMode
-        && other.gestureSettings == gestureSettings
-        && listEquals(other.displayFeatures, displayFeatures);
+        && other.gestureSettings == gestureSettings;
   }
 
   @override
@@ -606,7 +586,6 @@ class MediaQueryData {
       boldText,
       navigationMode,
       gestureSettings,
-      hashList(displayFeatures),
     );
   }
 
@@ -626,9 +605,8 @@ class MediaQueryData {
       'disableAnimations: $disableAnimations',
       'invertColors: $invertColors',
       'boldText: $boldText',
-      'navigationMode: ${navigationMode.name}',
+      'navigationMode: ${describeEnum(navigationMode)}',
       'gestureSettings: $gestureSettings',
-      'displayFeatures: $displayFeatures',
     ];
     return '${objectRuntimeType(this, 'MediaQueryData')}(${properties.join(', ')})';
   }

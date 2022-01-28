@@ -18,7 +18,7 @@ void main() {
 }
 
 // This implements a custom phone number input field that handles the
-// [DeleteCharacterIntent] intent.
+// [DeleteTextIntent] intent.
 class DigitInput extends StatefulWidget {
   const DigitInput({
     Key? key,
@@ -38,12 +38,11 @@ class DigitInput extends StatefulWidget {
 }
 
 class DigitInputState extends State<DigitInput> {
-  late final Action<DeleteCharacterIntent> _deleteTextAction =
-      CallbackAction<DeleteCharacterIntent>(
-    onInvoke: (DeleteCharacterIntent intent) {
+  late final Action<DeleteTextIntent> _deleteTextAction =
+      CallbackAction<DeleteTextIntent>(
+    onInvoke: (DeleteTextIntent intent) {
       // For simplicity we delete everything in the section.
       widget.controller.clear();
-      return null;
     },
   );
 
@@ -51,8 +50,8 @@ class DigitInputState extends State<DigitInput> {
   Widget build(BuildContext context) {
     return Actions(
       actions: <Type, Action<Intent>>{
-        // Make the default `DeleteCharacterIntent` handler overridable.
-        DeleteCharacterIntent: Action<DeleteCharacterIntent>.overridable(
+        // Make the default `DeleteTextIntent` handler overridable.
+        DeleteTextIntent: Action<DeleteTextIntent>.overridable(
             defaultAction: _deleteTextAction, context: context),
       },
       child: TextField(
@@ -80,12 +79,12 @@ class SimpleUSPhoneNumberEntry extends StatefulWidget {
       _SimpleUSPhoneNumberEntryState();
 }
 
-class _DeleteDigit extends Action<DeleteCharacterIntent> {
+class _DeleteDigit extends Action<DeleteTextIntent> {
   _DeleteDigit(this.state);
 
   final _SimpleUSPhoneNumberEntryState state;
   @override
-  void invoke(DeleteCharacterIntent intent) {
+  Object? invoke(DeleteTextIntent intent) {
     assert(callingAction != null);
     callingAction?.invoke(intent);
 
@@ -117,7 +116,7 @@ class _SimpleUSPhoneNumberEntryState extends State<SimpleUSPhoneNumberEntry> {
   Widget build(BuildContext context) {
     return Actions(
       actions: <Type, Action<Intent>>{
-        DeleteCharacterIntent: _DeleteDigit(this),
+        DeleteTextIntent: _DeleteDigit(this),
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

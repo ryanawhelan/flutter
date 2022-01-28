@@ -175,10 +175,9 @@ void main() {
 
     await tester.pumpWidget(
       buildFrame(
-        delegates: <LocalizationsDelegate<dynamic>>[
+        delegates: <FooMaterialLocalizationsDelegate>[
           const FooMaterialLocalizationsDelegate(supportedLanguage: 'fr', backButtonTooltip: 'FR'),
           const FooMaterialLocalizationsDelegate(supportedLanguage: 'de', backButtonTooltip: 'DE'),
-          GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const <Locale>[
           Locale('en'),
@@ -212,9 +211,8 @@ void main() {
       buildFrame(
         // Accept whatever locale we're given
         localeResolutionCallback: (Locale? locale, Iterable<Locale> supportedLocales) => locale,
-        delegates: <LocalizationsDelegate<dynamic>>[
+        delegates: <FooMaterialLocalizationsDelegate>[
           const FooMaterialLocalizationsDelegate(supportedLanguage: 'allLanguages'),
-          GlobalCupertinoLocalizations.delegate,
         ],
         buildContent: (BuildContext context) {
           // Should always be 'foo', no matter what the locale is
@@ -242,9 +240,8 @@ void main() {
 
     await tester.pumpWidget(
       buildFrame(
-        delegates: <LocalizationsDelegate<dynamic>>[
+        delegates: <FooMaterialLocalizationsDelegate>[
           const FooMaterialLocalizationsDelegate(),
-          GlobalCupertinoLocalizations.delegate,
         ],
         // supportedLocales not specified, so all locales resolve to 'en'
         buildContent: (BuildContext context) {
@@ -300,7 +297,6 @@ void main() {
     // Yiddish was ji (ISO-639) is yi (ISO-639-1)
     await tester.binding.setLocale('ji', 'IL');
     await tester.pump();
-    expect(tester.takeException(), "Warning: This application's locale, yi_IL, is not supported by all of its localization delegates.");
     expect(tester.widget<Text>(find.byKey(textKey)).data, 'yi_IL');
 
     // Indonesian was in (ISO-639) is id (ISO-639-1)

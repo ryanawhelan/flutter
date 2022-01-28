@@ -29,14 +29,6 @@ TaskFunction createFlavorsTest() {
   );
 }
 
-TaskFunction createIntegrationTestFlavorsTest() {
-  return IntegrationTest(
-    '${flutterDirectory.path}/dev/integration_tests/flavors',
-    'integration_test/integration_test.dart',
-    extraOptions: <String>['--flavor', 'paid'],
-  );
-}
-
 TaskFunction createExternalUiIntegrationTest() {
   return DriverTest(
     '${flutterDirectory.path}/dev/integration_tests/external_ui',
@@ -174,16 +166,10 @@ class DriverTest {
 }
 
 class IntegrationTest {
-  IntegrationTest(
-    this.testDirectory,
-    this.testTarget, {
-      this.extraOptions = const <String>[],
-    }
-  );
+  IntegrationTest(this.testDirectory, this.testTarget);
 
   final String testDirectory;
   final String testTarget;
-  final List<String> extraOptions;
 
   Future<TaskResult> call() {
     return inDirectory<TaskResult>(testDirectory, () async {
@@ -197,7 +183,6 @@ class IntegrationTest {
         '-d',
         deviceId,
         testTarget,
-        ...extraOptions,
       ];
       await flutter('test', options: options);
 

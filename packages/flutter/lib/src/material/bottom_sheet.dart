@@ -508,7 +508,7 @@ class _ModalBottomSheetRoute<T> extends PopupRoute<T> {
       _animationController = transitionAnimationController;
       willDisposeAnimationController = false;
     } else {
-      _animationController = BottomSheet.createAnimationController(navigator!);
+      _animationController = BottomSheet.createAnimationController(navigator!.overlay!);
     }
     return _animationController!;
   }
@@ -722,9 +722,6 @@ Future<T?> showModalBottomSheet<T>({
 /// persistent bottom sheets (see the documentation for these on [BottomSheet]
 /// for more details).
 ///
-/// The [enableDrag] parameter specifies whether the bottom sheet can be
-/// dragged up and down and dismissed by swiping downwards.
-///
 /// To rebuild the bottom sheet (e.g. if it is stateful), call
 /// [PersistentBottomSheetController.setState] on the controller returned by
 /// this method.
@@ -762,7 +759,6 @@ PersistentBottomSheetController<T> showBottomSheet<T>({
   ShapeBorder? shape,
   Clip? clipBehavior,
   BoxConstraints? constraints,
-  bool? enableDrag,
   AnimationController? transitionAnimationController,
 }) {
   assert(context != null);
@@ -776,7 +772,6 @@ PersistentBottomSheetController<T> showBottomSheet<T>({
     shape: shape,
     clipBehavior: clipBehavior,
     constraints: constraints,
-    enableDrag: enableDrag,
     transitionAnimationController: transitionAnimationController,
   );
 }

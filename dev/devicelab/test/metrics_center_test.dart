@@ -38,9 +38,11 @@ void main() {
       };
       final List<MetricPoint> metricPoints = parse(results, <String, String>{}, 'test');
 
-      expect(metricPoints.length, 1);
+      expect(metricPoints.length, 2);
       expect(metricPoints[0].value, equals(0.4550425531914895));
-      expect(metricPoints[0].tags[kNameKey], 'test');
+      expect(metricPoints[0].tags[kNameKey], 'Linux test');
+      expect(metricPoints[1].value, equals(0.4550425531914895));
+      expect(metricPoints[1].tags[kNameKey], 'test');
     });
 
     test('without additional benchmark tags', () {
@@ -60,7 +62,7 @@ void main() {
       final List<MetricPoint> metricPoints = parse(results, <String, String>{}, 'task abc');
 
       expect(metricPoints[0].value, equals(0.4550425531914895));
-      expect(metricPoints[1].value, equals(0.473));
+      expect(metricPoints[2].value, equals(0.473));
     });
 
     test('with additional benchmark tags', () {
@@ -88,8 +90,8 @@ void main() {
 
       expect(metricPoints[0].value, equals(0.4550425531914895));
       expect(metricPoints[0].tags.keys.contains('arch'), isTrue);
-      expect(metricPoints[1].value, equals(0.473));
-      expect(metricPoints[1].tags.keys.contains('device_type'), isTrue);
+      expect(metricPoints[2].value, equals(0.473));
+      expect(metricPoints[2].tags.keys.contains('device_type'), isTrue);
     });
 
     test('succeeds - null ResultData', () {

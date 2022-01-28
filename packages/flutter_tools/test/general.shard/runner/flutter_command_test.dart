@@ -116,7 +116,7 @@ void main() {
       final CommandRunner<void> runner = createTestCommandRunner(flutterCommand);
       await runner.run(<String>['deprecated']);
 
-      expect(testLogger.warningText,
+      expect(testLogger.errorText,
         contains('The "deprecated" command is deprecated and will be removed in '
             'a future version of Flutter.'));
       expect(flutterCommand.usage,

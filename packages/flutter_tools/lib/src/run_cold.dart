@@ -13,7 +13,7 @@ import 'base/file_system.dart';
 import 'base/logger.dart';
 import 'build_info.dart';
 import 'device.dart';
-import 'globals.dart' as globals;
+import 'globals_null_migrated.dart' as globals;
 import 'resident_devtools_handler.dart';
 import 'resident_runner.dart';
 import 'tracing.dart';
@@ -77,8 +77,8 @@ class ColdRunner extends ResidentRunner {
           return result;
         }
       }
-    } on Exception catch (err, stack) {
-      globals.printError('$err\n$stack');
+    } on Exception catch (err) {
+      globals.printError(err.toString());
       appFailedToStart();
       return 1;
     }

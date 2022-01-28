@@ -17,7 +17,7 @@ import 'package:flutter_tools/src/base/user_messages.dart';
 import 'package:flutter_tools/src/build_info.dart';
 import 'package:flutter_tools/src/cache.dart';
 import 'package:flutter_tools/src/fuchsia/application_package.dart';
-import 'package:flutter_tools/src/globals.dart' as globals;
+import 'package:flutter_tools/src/globals_null_migrated.dart' as globals;
 import 'package:flutter_tools/src/ios/application_package.dart';
 import 'package:flutter_tools/src/ios/plist_parser.dart';
 import 'package:flutter_tools/src/project.dart';
@@ -84,8 +84,6 @@ void main() {
         applicationBinary: apkFile,
       );
       expect(applicationPackage.name, 'app.apk');
-      expect(applicationPackage, isA<PrebuiltApplicationPackage>());
-      expect((applicationPackage as PrebuiltApplicationPackage).applicationPackage.path, apkFile.path);
       expect(fakeProcessManager.hasRemainingExpectations, isFalse);
     }, overrides: overrides);
 
@@ -300,10 +298,9 @@ void main() {
       testPlistParser.setProperty('CFBundleIdentifier', 'fooBundleId');
       final PrebuiltIOSApp iosApp = IOSApp.fromPrebuiltApp(globals.fs.file('bundle.app')) as PrebuiltIOSApp;
       expect(testLogger.errorText, isEmpty);
-      expect(iosApp.uncompressedBundle.path, 'bundle.app');
+      expect(iosApp.bundleDir.path, 'bundle.app');
       expect(iosApp.id, 'fooBundleId');
       expect(iosApp.bundleName, 'bundle.app');
-      expect(iosApp.applicationPackage.path, globals.fs.directory('bundle.app').path);
     }, overrides: overrides);
 
     testUsingContext('Bad ipa zip-file, no payload dir', () {
@@ -351,10 +348,9 @@ void main() {
       };
       final PrebuiltIOSApp iosApp = IOSApp.fromPrebuiltApp(globals.fs.file('app.ipa')) as PrebuiltIOSApp;
       expect(testLogger.errorText, isEmpty);
-      expect(iosApp.uncompressedBundle.path, endsWith('bundle.app'));
+      expect(iosApp.bundleDir.path, endsWith('bundle.app'));
       expect(iosApp.id, 'fooBundleId');
       expect(iosApp.bundleName, 'bundle.app');
-      expect(iosApp.applicationPackage.path, globals.fs.file('app.ipa').path);
     }, overrides: overrides);
 
     testUsingContext('returns null when there is no ios or .ios directory', () async {
@@ -431,7 +427,6 @@ void main() {
       final PrebuiltFuchsiaApp fuchsiaApp = FuchsiaApp.fromPrebuiltApp(globals.fs.file('bundle.far')) as PrebuiltFuchsiaApp;
       expect(testLogger.errorText, isEmpty);
       expect(fuchsiaApp.id, 'bundle.far');
-      expect(fuchsiaApp.applicationPackage.path, globals.fs.file('bundle.far').path);
     }, overrides: overrides);
 
     testUsingContext('returns null when there is no fuchsia', () async {

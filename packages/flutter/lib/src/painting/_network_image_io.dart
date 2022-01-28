@@ -51,10 +51,12 @@ class NetworkImage extends image_provider.ImageProvider<image_provider.NetworkIm
       chunkEvents: chunkEvents.stream,
       scale: key.scale,
       debugLabel: key.url,
-      informationCollector: () => <DiagnosticsNode>[
-        DiagnosticsProperty<image_provider.ImageProvider>('Image provider', this),
-        DiagnosticsProperty<image_provider.NetworkImage>('Image key', key),
-      ],
+      informationCollector: () {
+        return <DiagnosticsNode>[
+          DiagnosticsProperty<image_provider.ImageProvider>('Image provider', this),
+          DiagnosticsProperty<image_provider.NetworkImage>('Image key', key),
+        ];
+      },
     );
   }
 

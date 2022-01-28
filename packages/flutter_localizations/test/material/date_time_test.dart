@@ -35,7 +35,9 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           supportedLocales: <Locale>[locale],
           locale: locale,
-          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+            GlobalMaterialLocalizations.delegate,
+          ],
           home: Builder(builder: (BuildContext context) {
             completer.complete(MaterialLocalizations.of(context).formatHour(timeOfDay));
             return Container();
@@ -80,7 +82,9 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           supportedLocales: <Locale>[locale],
           locale: locale,
-          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+            GlobalMaterialLocalizations.delegate,
+          ],
           home: Builder(builder: (BuildContext context) {
             completer.complete(MaterialLocalizations.of(context).formatTimeOfDay(timeOfDay));
             return Container();
@@ -122,7 +126,9 @@ void main() {
         await tester.pumpWidget(MaterialApp(
           supportedLocales: <Locale>[locale],
           locale: locale,
-          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+            GlobalMaterialLocalizations.delegate,
+          ],
           home: Builder(builder: (BuildContext context) {
             final MaterialLocalizations localizations = MaterialLocalizations.of(context);
             completer.complete(<DateType, String>{
@@ -178,9 +184,12 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       locale: const Locale('en', 'US'),
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+        GlobalMaterialLocalizations.delegate,
+      ],
       home: Builder(builder: (BuildContext context) {
         dateFormat = DateFormat('EEE, d MMM yyyy HH:mm:ss', 'en_US');
+
         return Container();
       }),
     ));

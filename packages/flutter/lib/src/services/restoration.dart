@@ -304,7 +304,7 @@ class RestorationManager extends ChangeNotifier {
     );
   }
 
-  Future<void> _methodHandler(MethodCall call) async {
+  Future<Object?> _methodHandler(MethodCall call) async {
     switch (call.method) {
       case 'push':
         _parseAndHandleRestorationUpdateFromEngine(call.arguments as Map<Object?, Object?>);

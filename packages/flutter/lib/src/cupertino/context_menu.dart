@@ -9,16 +9,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import 'colors.dart';
-
 // The scale of the child at the time that the CupertinoContextMenu opens.
 // This value was eyeballed from a physical device running iOS 13.1.2.
 const double _kOpenScale = 1.1;
-
-const Color _borderColor = CupertinoDynamicColor.withBrightness(
-  color: Color(0xFFA9A9AF),
-  darkColor: Color(0xFF57585A),
-);
 
 typedef _DismissCallback = void Function(
   BuildContext context,
@@ -1158,8 +1151,8 @@ class _ContextMenuSheet extends StatelessWidget {
 
   // Get the children, whose order depends on orientation and
   // contextMenuLocation.
-  List<Widget> getChildren(BuildContext context) {
-    final Widget menu = Flexible(
+  List<Widget> get children {
+    final Flexible menu = Flexible(
       fit: FlexFit.tight,
       flex: 2,
       child: IntrinsicHeight(
@@ -1167,22 +1160,7 @@ class _ContextMenuSheet extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(13.0)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              actions.first,
-              for (Widget action in actions.skip(1))
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: CupertinoDynamicColor.resolve(_borderColor, context),
-                        width: 0.5,
-                      )
-                    ),
-                  ),
-                  position: DecorationPosition.foreground,
-                  child: action,
-                ),
-            ],
+            children: actions,
           ),
         ),
       ),
@@ -1217,7 +1195,7 @@ class _ContextMenuSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: getChildren(context),
+      children: children,
     );
   }
 }
